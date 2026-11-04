@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Traefork — a soft-fork of Traefik, kept in sync with upstream, with additional plugins compiled into Traefik itself.">
+  <title>Traefork — Mutex Studio</title>
+
+  <link rel="icon" href="/assets/img/favicons/icon.svg?v=5" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png?v=5">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png?v=5">
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/img/favicons/favicon.ico?v=5">
+  <link rel="manifest" href="/assets/img/favicons/site.webmanifest">
+  <link rel="stylesheet" href="/assets/css/site.css?v=16">
+</head>
+
+<body class="accent-emerald">
+
+  <nav class="site-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+    </a>
+
+    <div class="nav-desktop">
+      <div class="nav-group">
+        <button type="button" class="nav-trigger" aria-haspopup="true">
+          Products
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="/azure-autoscaler/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--blue">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Azure Autoscaler</div>
+              <div class="nav-dropdown-desc">Smart resource scaling</div>
+            </div>
+          </a>
+          <a href="/storage-observer/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--violet">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Storage Observer</div>
+              <div class="nav-dropdown-desc">File storage at any scale</div>
+            </div>
+          </a>
+          <a href="/traefik-precompiled/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--emerald">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Traefork</div>
+              <div class="nav-dropdown-desc">Soft-fork, plugins compiled in</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <a href="/consulting/" class="nav-link nav-link-consulting">Consulting</a>
+    </div>
+
+    <a href="/consulting/#contact" class="nav-cta">Talk to us</a>
+
+    <button type="button" id="mobile-menu-btn" class="nav-mobile-btn" aria-label="Open menu">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="nav-mobile">
+    <p class="nav-mobile-label">Products</p>
+    <a href="/azure-autoscaler/" class="nav-mobile-link">Azure Autoscaler</a>
+    <a href="/storage-observer/" class="nav-mobile-link">Storage Observer</a>
+    <a href="/traefik-precompiled/" class="nav-mobile-link">Traefork</a>
+    <div class="nav-mobile-divider"></div>
+    <a href="/consulting/" class="nav-mobile-link">Consulting</a>
+    <a href="/consulting/#contact" class="nav-mobile-cta">Talk to us</a>
+  </div>
+</nav>
+
+  <section class="hero hero-grid">
+    <div class="hero-glow hero-glow--center"></div>
+    <div class="container hero-content">
+      <a href="/" class="hero-back">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        Back to Mutex Studio
+      </a>
+      <div class="hero-narrow">
+        <h1 class="heading-xl">
+          <span class="gradient-text">Traefork</span>
+        </h1>
+        <p class="lead">
+          A soft-fork of Traefik, kept in sync with upstream. It precompiles additional plugins into Traefik itself.
+        </p>
+        <p class="disclaimer">Built on Traefik (MIT). Not affiliated with or endorsed by Traefik Labs.</p>
+        <a href="/consulting/#contact" class="btn btn-primary btn-primary--lg">Request Access</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--border">
+    <div class="container">
+      <div class="grid-2 grid-2--wide">
+        <div>
+          <p class="eyebrow">The fork</p>
+          <h2 class="heading-lg mb-6">Plugins compiled into Traefik.</h2>
+          <p class="text-muted mb-6">
+            Traefik loads community middleware with Yaegi, a Go interpreter. Those middlewares run on every request, so the interpreter sits on the hot path: more memory, more CPU, and profiles that do not show the plugin code.
+          </p>
+          <p class="text-muted">
+            Traefork keeps the upstream tree in sync and compiles the extra plugins into the binary. The plugin source stays the same. Upstream declined shipping that workflow.
+          </p>
+        </div>
+
+        <div>
+          <div class="card card--feature mb-6">
+            <div class="feature-row">
+              <div class="card-icon card-icon--plain-emerald card-icon--sm">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              </div>
+              <div>
+                <h3 class="heading-md">Compiled into the binary</h3>
+                <p class="text-sm text-muted">ModSecurity, Geoblock, RealIP, CrowdSec, and Sablier are part of the Traefik build. Yaegi does not run them. A Yaegi plugin can still be loaded when it is not in this set.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card card--feature mb-6">
+            <div class="feature-row">
+              <div class="card-icon card-icon--plain-emerald card-icon--sm">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+              </div>
+              <div>
+                <h3 class="heading-md">Kept in sync with upstream</h3>
+                <p class="text-sm text-muted">Each release tracks an upstream Traefik version and pins the plugins compiled into it. The fork carries the compile-in patch.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card card--feature">
+            <div class="feature-row">
+              <div class="card-icon card-icon--plain-emerald card-icon--sm">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              </div>
+              <div>
+                <h3 class="heading-md">Tested as a set</h3>
+                <p class="text-sm text-muted">The image is exercised with the compiled middlewares before it is published, including a comparison against the same stacks running under Yaegi.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--border">
+    <div class="container">
+      <div class="section-header section-header--sm">
+        <p class="eyebrow">What's included</p>
+        <h2 class="heading-lg">Upstream Traefik, plus these plugins.</h2>
+        <p class="text-muted max-w-2xl">Compiled into the binary. Each release pins the upstream Traefik version and these plugin versions.</p>
+      </div>
+      <div class="grid-included">
+        <div class="included-item"><p class="title">Traefik core</p><p class="desc">Upstream proxy, kept in sync</p></div>
+        <div class="included-item"><p class="title">ModSecurity</p><p class="desc">WAF middleware</p></div>
+        <div class="included-item"><p class="title">Geoblock</p><p class="desc">Country lookup and blocking</p></div>
+        <div class="included-item"><p class="title">RealIP</p><p class="desc">Client IP from trusted proxies</p></div>
+        <div class="included-item"><p class="title">CrowdSec</p><p class="desc">Bouncer, and a fork of that plugin</p></div>
+        <div class="included-item"><p class="title">Sablier</p><p class="desc">Wake a service on request</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="compare" class="section section--border">
+    <div class="container">
+      <div class="section-header section-header--sm">
+        <p class="eyebrow">Instead of Front Door</p>
+        <h2 class="heading-lg">The request is the advantage.</h2>
+        <p class="text-muted max-w-3xl">You switch because Traefork handles the request: routing, certificates, and a security stack compiled into the ingress. In Europe, under 10 TB, a gigabyte from Front Door’s edge is $0.083 and a gigabyte from a virtual machine on routing preference Internet is $0.08.</p>
+      </div>
+
+      <div class="door-arch">
+        <div class="door-col">
+          <p class="door-kicker">Azure Front Door Premium</p>
+          <div class="door-box"><strong>Clients</strong><ul><li>TLS ends at the Front Door profile</li></ul></div>
+          <div class="door-flow" aria-hidden="true"></div>
+          <div class="door-box">
+            <strong>Front Door profile</strong>
+            <ul>
+              <li><span>Routing</span> Host and path, plus a rules engine that rewrites and redirects.</li>
+              <li><span>Certificates</span> A managed certificate owned by the profile.</li>
+              <li><span>Security</span> Microsoft’s managed WAF and bot rules.</li>
+            </ul>
+          </div>
+          <div class="door-flow" aria-hidden="true"></div>
+          <div class="door-box"><strong>Kubernetes origin</strong><ul><li>The cluster is a backend. The route, the certificate, and the WAF live in another control plane.</li></ul></div>
+        </div>
+        <div class="door-col door-col--fork">
+          <p class="door-kicker">Traefork</p>
+          <div class="door-box"><strong>Clients</strong><ul><li>TLS ends on the node</li></ul></div>
+          <div class="door-flow" aria-hidden="true"></div>
+          <div class="door-box">
+            <strong>One node in the cluster</strong>
+            <ul>
+              <li><span>Routing</span> Host, path, headers, method, query. Weight, mirror, TCP.</li>
+              <li><span>Certificates</span> ACME on the route, including a DNS-01 wildcard.</li>
+              <li><span>Security</span> Rate limit, then ModSecurity, then CrowdSec. Compiled in.</li>
+            </ul>
+          </div>
+          <div class="door-flow" aria-hidden="true"></div>
+          <div class="door-box"><strong>Cluster services</strong><ul><li>The next hop is the service. The middleware chain is attached to that route.</li></ul></div>
+        </div>
+      </div>
+
+      <div class="grid-3 door-points">
+        <div class="card card--feature">
+          <h3 class="heading-md">Routing</h3>
+          <p class="text-sm text-muted">A Traefik router matches host, path, headers, method, and query, then sends the request to a weighted set of services, a mirror, or a TCP service. Front Door matches host and path. Its rules engine rewrites and redirects, and an origin group can carry a weight.</p>
+        </div>
+        <div class="card card--feature">
+          <h3 class="heading-md">Certificates</h3>
+          <p class="text-sm text-muted">ACME runs on the ingress. The certificate is issued for that route, from an account you control, including a DNS-01 wildcard. Front Door’s managed certificate is free, and it belongs to the Front Door profile.</p>
+        </div>
+        <div class="card card--feature">
+          <h3 class="heading-md">Security</h3>
+          <p class="text-sm text-muted">Rate limit, ModSecurity, and CrowdSec run in that order inside the Traefork process. Each route can carry its own chain. Front Door Premium applies its managed WAF and bot rules at the edge. It does not run ModSecurity or a CrowdSec bouncer.</p>
+        </div>
+      </div>
+
+      <div class="section-header section-header--sm">
+        <p class="eyebrow">The bill</p>
+        <h2 class="heading-lg">A quarter of the Front Door bill.</h2>
+        <p class="text-muted max-w-3xl">Five million requests a day, about 4 KB on the way back. That is 600 GB out. Front Door Premium is $607.80. Traefork is $143.58. The profile is $330 a month until you delete it, and every million requests is $1.50, including a request the WAF blocks. Those two meters are $555. Edge back to origin is $3. Out to clients is $49.80 from the edge and $40 from the node.</p>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table cost-table cost-table--fit">
+          <thead>
+            <tr>
+              <th>Meter</th>
+              <th>Front Door Premium</th>
+              <th>Traefork</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Base fee</td>
+              <td>$330</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td>Requests</td>
+              <td>$225</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td>Out to clients</td>
+              <td>$49.80</td>
+              <td>$40</td>
+            </tr>
+            <tr>
+              <td>Edge back to origin</td>
+              <td>$3</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td>Node, 1-year reserved</td>
+              <td>—</td>
+              <td>$103.58</td>
+            </tr>
+            <tr class="cost-total">
+              <td>Month</td>
+              <td>$607.80</td>
+              <td>$143.58</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-muted">You keep $464.22 a month, $5,571 a year. 150 million responses at about 4 KB are 600 GB, and 600 × $0.083 is $49.80. The $555 of profile and request charges is most of the Front Door bill. The published request price covers the first 250 million a month, about 8.3 million requests a day, and the requests after that are contact-us. Premium includes the managed WAF, bot rules, and the rules engine. Access logs are a separate meter when you export them: Analytics Logs in West Europe are $2.99 a gigabyte after the first 5 GB, and this log cannot use the Basic plan at $0.65. CrowdSec on the node is $0. The node is a Standard_D4s_v5, 1-year reservation. Outbound uses routing preference Internet: the first 100 GB are free, then 500 GB × $0.08.</p>
+    </div>
+  </section>
+
+  <section id="licenses" class="section section--border">
+    <div class="container">
+      <div class="section-header section-header--sm">
+        <p class="eyebrow">Open Source</p>
+        <h2 class="heading-lg">Licenses &amp; compliance</h2>
+        <p class="text-muted max-w-3xl">
+          Traefork redistributes Traefik and the plugins compiled into it. We comply with the license terms of every component in each image. This page summarizes the approach — the authoritative list is the <code class="inline-code">NOTICE</code> file shipped inside every release.
+        </p>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>License</th>
+              <th class="hide-sm">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Traefik</td>
+              <td class="license-mit">MIT</td>
+              <td class="hide-sm text-muted">Copyright Traefik Labs. Mutex Studio is not affiliated with Traefik Labs.</td>
+            </tr>
+            <tr>
+              <td>Embedded plugins</td>
+              <td class="license-mit">MIT / Apache 2.0</td>
+              <td class="hide-sm text-muted">Per-plugin license listed in the image NOTICE file. Only permissive OSS licenses are included.</td>
+            </tr>
+            <tr>
+              <td>Mutex Studio additions</td>
+              <td class="text-muted">Proprietary</td>
+              <td class="hide-sm text-muted">Image build, curation, testing, and release packaging by Mutex Studio S.L.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3 class="heading-md">What we ship</h3>
+          <ul class="list-arrow text-sm text-muted">
+            <li><span>→</span> A <code class="inline-code">NOTICE</code> file listing every OSS component and its license</li>
+            <li><span>→</span> Full copyright and attribution notices as required by upstream licenses</li>
+            <li><span>→</span> Source references for all embedded open-source plugins</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="heading-md">Trademark notice</h3>
+          <p class="text-sm text-muted">Traefik® is a registered trademark of Traefik Labs. Traefork is an independent soft-fork of the open-source Traefik project. Use of the Traefik name refers to the upstream software, not an official Traefik Labs offering.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--border text-center">
+    <div class="container">
+      <h2 class="heading-lg mb-6">Need a specific plugin bundle?</h2>
+      <p class="text-muted max-w-xl mb-6">Get in touch for the current image tags, embedded plugin lists, and custom bundles for your stack.</p>
+      <a href="/consulting/#contact" class="btn btn-primary btn-primary--lg">
+        Get in touch
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" class="footer-logo-link">
+        <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+      </a>
+      <p class="footer-tagline">Infrastructure tooling that fills the gaps. Self-hosted, production-grade.</p>
+    </div>
+    <div class="footer-columns">
+      <div>
+        <p class="footer-heading">Products</p>
+        <ul class="footer-links">
+          <li><a href="/azure-autoscaler/">Azure Autoscaler</a></li>
+          <li><a href="/storage-observer/">Storage Observer</a></li>
+          <li><a href="/traefik-precompiled/">Traefork</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-heading">Company</p>
+        <ul class="footer-links">
+          <li><a href="/consulting/">Consulting</a></li>
+          <li><a href="/consulting/#contact">Contact</a></li>
+          <li><a href="/traefik-precompiled/#licenses">Open Source Licenses</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Mutex Studio S.L. All rights reserved.</p>
+    <nav class="footer-legal" aria-label="Legal">
+      <a href="/privacy/">Privacy</a>
+      <a href="/cookies/">Cookies</a>
+      <a href="#" data-cookie-settings>Cookie settings</a>
+    </nav>
+    <p>MUTEX STUDIO S.L. (Sociedad Unipersonal) · NIF B05790308 · <a href="mailto:info@mutexstudio.com">info@mutexstudio.com</a></p>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js?v=3"></script>
+</body>
+</html>

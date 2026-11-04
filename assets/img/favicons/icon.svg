@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Mutex Studio">
+  <defs>
+    <linearGradient id="ms-bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="url(#ms-bg)"/>
+  <path fill="#fff" transform="translate(13.4 16.6) scale(0.62)" d="M0 0H6L30 17L54 0H60V50H46V19L34 26V31L40 29V44L30 50L20 44V29L26 31V26L14 19V50H0Z"/>
+</svg>

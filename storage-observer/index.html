@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Storage Observer — Find which folder holds the bytes. Scan local disks, shares, SharePoint, S3, and Azure storage, then see path, cost, and growth. Self-hosted.">
+  <title>Storage Observer — Mutex Studio</title>
+
+  <link rel="icon" href="/assets/img/favicons/icon.svg?v=5" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png?v=5">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png?v=5">
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/img/favicons/favicon.ico?v=5">
+  <link rel="manifest" href="/assets/img/favicons/site.webmanifest">
+  <link rel="stylesheet" href="/assets/css/site.css?v=11">
+</head>
+
+<body class="accent-violet">
+
+  <nav class="site-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+    </a>
+
+    <div class="nav-desktop">
+      <div class="nav-group">
+        <button type="button" class="nav-trigger" aria-haspopup="true">
+          Products
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="/azure-autoscaler/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--blue">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Azure Autoscaler</div>
+              <div class="nav-dropdown-desc">Smart resource scaling</div>
+            </div>
+          </a>
+          <a href="/storage-observer/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--violet">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Storage Observer</div>
+              <div class="nav-dropdown-desc">File storage at any scale</div>
+            </div>
+          </a>
+          <a href="/traefik-precompiled/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--emerald">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Traefork</div>
+              <div class="nav-dropdown-desc">Soft-fork, plugins compiled in</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <a href="/consulting/" class="nav-link nav-link-consulting">Consulting</a>
+    </div>
+
+    <a href="/consulting/#contact" class="nav-cta">Talk to us</a>
+
+    <button type="button" id="mobile-menu-btn" class="nav-mobile-btn" aria-label="Open menu">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="nav-mobile">
+    <p class="nav-mobile-label">Products</p>
+    <a href="/azure-autoscaler/" class="nav-mobile-link">Azure Autoscaler</a>
+    <a href="/storage-observer/" class="nav-mobile-link">Storage Observer</a>
+    <a href="/traefik-precompiled/" class="nav-mobile-link">Traefork</a>
+    <div class="nav-mobile-divider"></div>
+    <a href="/consulting/" class="nav-mobile-link">Consulting</a>
+    <a href="/consulting/#contact" class="nav-mobile-cta">Talk to us</a>
+  </div>
+</nav>
+
+  <section class="hero hero-grid">
+    <div class="hero-glow hero-glow--center"></div>
+    <div class="container hero-content">
+      <a href="/" class="hero-back">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        Back to Mutex Studio
+      </a>
+      <div class="hero-narrow">
+        <h1 class="heading-xl">
+          Storage <span class="gradient-text">Observer</span>
+        </h1>
+        <p class="lead">
+          Capacity is one number. The folder that holds it is not. Scan local disks, network shares, SharePoint, S3, Azure Files, and Blob, <strong>then see which path is using the space, what it costs, and how that folder grew.</strong>
+        </p>
+        <div class="badge badge--violet mb-6">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01"/></svg>
+          Self-hosted. The scan runs next to the files.
+        </div>
+        <a href="#buy" class="btn btn-primary btn-primary--lg">Buy now</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works" class="section section--border">
+    <div class="container">
+      <div class="section-header">
+        <p class="eyebrow">How it works</p>
+        <h2 class="heading-lg">Daemons where the files are.<br>One screen for the storage.</h2>
+        <p class="text-muted max-w-3xl">Deploy a daemon next to each source. It reads local disks, network shares, SharePoint, AWS, and Azure storage, then reports usage to a central server. The GUI shows how much each source consumes.</p>
+      </div>
+      <div class="arch">
+        <div class="arch-sources">
+          <article class="arch-node">
+            <p class="arch-kicker">Daemon</p>
+            <h3 class="heading-md">Local filesystem</h3>
+            <p>On the machine that holds the files</p>
+          </article>
+          <article class="arch-node">
+            <p class="arch-kicker">Daemon</p>
+            <h3 class="heading-md">Network shares</h3>
+            <p>NFS and SMB</p>
+          </article>
+          <article class="arch-node">
+            <p class="arch-kicker">Daemon</p>
+            <h3 class="heading-md">SharePoint</h3>
+            <p>Document libraries</p>
+          </article>
+          <article class="arch-node">
+            <p class="arch-kicker">Daemon</p>
+            <h3 class="heading-md">AWS storage</h3>
+            <p>S3</p>
+          </article>
+          <article class="arch-node">
+            <p class="arch-kicker">Daemon</p>
+            <h3 class="heading-md">Azure Files</h3>
+            <p>File shares</p>
+          </article>
+          <article class="arch-node">
+            <p class="arch-kicker">Daemon</p>
+            <h3 class="heading-md">Azure Blob</h3>
+            <p>Blob and ADLS</p>
+          </article>
+        </div>
+        <div class="arch-flow" aria-hidden="true">
+          <span>Reports usage</span>
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </div>
+        <article class="arch-server">
+          <p class="arch-kicker">Central server</p>
+          <h3 class="heading-md">GUI · consumed storage</h3>
+          <p>Example view</p>
+          <ul class="arch-gui">
+            <li>
+              <span class="name">Local disk</span>
+              <span class="size">1.2 TB</span>
+              <span class="arch-bar"><span style="width:39%"></span></span>
+            </li>
+            <li>
+              <span class="name">SharePoint</span>
+              <span class="size">840 GB</span>
+              <span class="arch-bar"><span style="width:27%"></span></span>
+            </li>
+            <li>
+              <span class="name">Azure Blob</span>
+              <span class="size">3.1 TB</span>
+              <span class="arch-bar"><span style="width:100%"></span></span>
+            </li>
+          </ul>
+          <div class="arch-total">
+            <span>Total consumed</span>
+            <strong>5.1 TB</strong>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="app" class="section section--border">
+    <div class="container">
+      <div class="section-header">
+        <p class="eyebrow">Roots</p>
+        <h2 class="heading-lg">Files, capacity, and cost.</h2>
+        <p class="text-muted">What each root is using, and what that storage costs each month.</p>
+      </div>
+      <div class="so-frame">
+        <div class="so-topbar">
+          <span class="so-brand">Storage Observer</span>
+          <span class="so-pill">Daemons</span>
+        </div>
+        <div class="so-body">
+          <aside class="so-nav" aria-label="App navigation">
+            <span class="is-active">Roots</span>
+            <span>Scans</span>
+            <span>Daemons</span>
+            <span>Settings</span>
+          </aside>
+          <div class="so-main">
+            <h3>All roots</h3>
+            <p class="so-sub">Filter and sort configured scan roots. Polls every 5s while any scan is running.</p>
+            <div class="so-stats">
+              <div><span>Total roots</span><strong>16</strong></div>
+              <div><span>Total files</span><strong>8,349,636</strong></div>
+              <div><span>Total folders</span><strong>4,519,010</strong></div>
+              <div><span>Measured used</span><strong>2.2 TB</strong></div>
+              <div><span>Capacity</span><strong>4.9 TB</strong></div>
+              <div><span>Usage</span><strong>2.8 TB</strong></div>
+              <div><span>Storage /mo</span><strong>$1,060</strong></div>
+              <div><span>Snapshots /mo</span><strong>$576</strong></div>
+            </div>
+            <div class="so-filters">
+              <label>Search<input placeholder="Name or path…"></label>
+              <label>Daemons<select><option>All Daemons</option></select></label>
+              <label>Source type<select><option>All types</option></select></label>
+              <label>Scan status<select><option>Any</option></select></label>
+              <span>4 of 16 roots</span>
+            </div>
+            <div class="so-table-wrap">
+              <table class="so-table">
+                <thead>
+                  <tr>
+                    <th>Root</th>
+                    <th>Path</th>
+                    <th>Daemon</th>
+                    <th>Size</th>
+                    <th>Used</th>
+                    <th>Utilization</th>
+                    <th>Files</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>app-data</td>
+                    <td class="so-path">/data/app</td>
+                    <td>observer-01</td>
+                    <td>9.4 GB <em>+1.9 GB</em></td>
+                    <td>0.6 GB</td>
+                    <td><span class="so-util"><span style="width:7%"></span></span> 7%</td>
+                    <td>1,724</td>
+                    <td class="so-ok">Completed</td>
+                  </tr>
+                  <tr>
+                    <td>app-logs</td>
+                    <td class="so-path">/data/logs</td>
+                    <td>observer-01</td>
+                    <td>305.2 GB <em>+18.2 GB</em></td>
+                    <td>311.6 GB</td>
+                    <td><span class="so-util"><span style="width:68%"></span></span> 68%</td>
+                    <td>5,603</td>
+                    <td class="so-ok">Completed</td>
+                  </tr>
+                  <tr>
+                    <td>app-temp</td>
+                    <td class="so-path">/data/temp</td>
+                    <td>observer-01</td>
+                    <td>235.4 GB <em>+20 MB</em></td>
+                    <td>277.4 GB</td>
+                    <td><span class="so-util"><span style="width:85%"></span></span> 85%</td>
+                    <td>2,774,618</td>
+                    <td class="so-ok">Completed</td>
+                  </tr>
+                  <tr>
+                    <td>media</td>
+                    <td class="so-path">/data/media</td>
+                    <td>observer-02</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td class="so-bad">Failed</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="navigate" class="section section--border">
+    <div class="container">
+      <div class="section-header">
+        <p class="eyebrow">Navigation</p>
+        <h2 class="heading-lg">Direct children, or the whole subtree.</h2>
+        <p class="text-muted">A folder can report 300 GB and hold 12 files. The rest is underneath. Each row splits what sits in this directory — direct files and direct folders — from the totals for the tree below it, including empty folders. Sort by direct children when the size is only being passed through.</p>
+      </div>
+      <div class="so-frame">
+        <div class="so-topbar">
+          <span class="so-brand">Storage Observer</span>
+          <span class="so-top-meta">
+            <span class="so-live">1 running</span>
+            <span class="so-pill">Daemons</span>
+            <span class="so-pill">Roots</span>
+          </span>
+        </div>
+        <div class="so-body">
+          <aside class="so-nav" aria-label="Folder navigation">
+            <span class="is-active">Navigate</span>
+            <span>Scan history</span>
+            <span>Summary</span>
+            <span class="so-nav-gap">Roots</span>
+            <span>Scans</span>
+            <span>Daemons</span>
+            <span>Settings</span>
+          </aside>
+          <div class="so-main">
+            <div class="so-folder-head">
+              <h3>app-logs</h3>
+              <span class="so-tab is-on">Navigate</span>
+              <span class="so-tab">Details</span>
+            </div>
+            <div class="so-filters">
+              <span class="so-count">Showing 6 items</span>
+              <label>Filter name<input placeholder="Starts with…"></label>
+              <label>Sort<select><option>Direct children</option></select></label>
+            </div>
+            <div class="so-table-wrap">
+              <table class="so-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Size</th>
+                    <th>% parent</th>
+                    <th>Files</th>
+                    <th>Folders</th>
+                    <th>Direct files</th>
+                    <th>Direct folders</th>
+                    <th>Empty folders</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>releases</td>
+                    <td>8.3 GB</td>
+                    <td><span class="so-pct">98%</span></td>
+                    <td>490</td>
+                    <td>80</td>
+                    <td>12</td>
+                    <td>3</td>
+                    <td>13</td>
+                  </tr>
+                  <tr>
+                    <td>archive</td>
+                    <td>70.5 MB</td>
+                    <td><span class="so-pct">&lt;1%</span></td>
+                    <td>88</td>
+                    <td>13</td>
+                    <td>9</td>
+                    <td>0</td>
+                    <td>9</td>
+                  </tr>
+                  <tr>
+                    <td>crash</td>
+                    <td>11.6 MB</td>
+                    <td><span class="so-pct">2%</span></td>
+                    <td>74</td>
+                    <td>11</td>
+                    <td>6</td>
+                    <td>0</td>
+                    <td>6</td>
+                  </tr>
+                  <tr>
+                    <td>trace</td>
+                    <td>90 KB</td>
+                    <td><span class="so-pct">&lt;1%</span></td>
+                    <td>38</td>
+                    <td>39</td>
+                    <td>36</td>
+                    <td>7</td>
+                    <td>36</td>
+                  </tr>
+                  <tr>
+                    <td>iis</td>
+                    <td>0 B</td>
+                    <td><span class="so-pct">0%</span></td>
+                    <td>0</td>
+                    <td>9</td>
+                    <td>0</td>
+                    <td>3</td>
+                    <td>9</td>
+                  </tr>
+                  <tr>
+                    <td>temp</td>
+                    <td>0 B</td>
+                    <td><span class="so-pct">0%</span></td>
+                    <td>0</td>
+                    <td>5</td>
+                    <td>0</td>
+                    <td>3</td>
+                    <td>5</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="history" class="section section--border">
+    <div class="container">
+      <div class="section-header">
+        <p class="eyebrow">History</p>
+        <h2 class="heading-lg">Folder growth over time.</h2>
+        <p class="text-muted">Size and child count for any folder, from the first scan to the latest.</p>
+      </div>
+      <div class="so-frame">
+        <div class="so-topbar">
+          <span class="so-brand">Storage Observer</span>
+          <span class="so-top-meta">
+            <span class="so-live">1 running</span>
+            <span class="so-pill">Daemons</span>
+            <span class="so-pill">Roots</span>
+          </span>
+        </div>
+        <div class="so-body">
+          <aside class="so-nav" aria-label="Folder history">
+            <span class="is-active">Navigate</span>
+            <span>Scan history</span>
+            <span>Summary</span>
+            <span class="so-nav-gap">Roots</span>
+            <span>Scans</span>
+            <span>Daemons</span>
+            <span>Settings</span>
+          </aside>
+          <div class="so-main">
+            <p class="so-crumb"><span>← Back</span> releases <span class="so-path">/data/logs/releases/</span></p>
+            <div class="so-history-tabs">
+              <span>Summary</span>
+              <span class="is-on">History</span>
+              <span>Age</span>
+              <span>Map</span>
+              <span>Top stats</span>
+              <span>Storage</span>
+            </div>
+            <h3>Size over time</h3>
+            <svg class="so-chart" viewBox="0 0 640 180" role="img" aria-label="Folder size rising from about 52 GB in May 2025 to 78 GB in October 2026">
+              <g stroke="#e2e8f0" stroke-width="1">
+                <line x1="56" y1="28" x2="610" y2="28"/>
+                <line x1="56" y1="84" x2="610" y2="84"/>
+                <line x1="56" y1="140" x2="610" y2="140"/>
+              </g>
+              <g fill="#94a3b8" font-size="11" font-family="Inter, sans-serif">
+                <text x="8" y="32">80 GB</text>
+                <text x="8" y="88">60 GB</text>
+                <text x="8" y="144">40 GB</text>
+              </g>
+              <polyline fill="none" stroke="#64748b" stroke-width="2" points="70,116 178,110 286,106 394,100 502,74 610,42"/>
+              <polyline fill="none" stroke="#2563eb" stroke-width="2" points="70,112 178,106 286,102 394,96 502,70 610,36"/>
+              <g fill="#2563eb">
+                <circle cx="70" cy="112" r="3.5"/><circle cx="178" cy="106" r="3.5"/><circle cx="286" cy="102" r="3.5"/>
+                <circle cx="394" cy="96" r="3.5"/><circle cx="502" cy="70" r="3.5"/><circle cx="610" cy="36" r="3.5"/>
+              </g>
+              <g fill="#94a3b8" font-size="11" font-family="Inter, sans-serif" text-anchor="middle">
+                <text x="70" y="166">May 2025</text>
+                <text x="178" y="166">Aug 2025</text>
+                <text x="286" y="166">Nov 2025</text>
+                <text x="394" y="166">Feb 2026</text>
+                <text x="502" y="166">Jun 2026</text>
+                <text x="610" y="166">Oct 2026</text>
+              </g>
+            </svg>
+            <p class="so-legend"><i class="so-dot so-dot--slate"></i> Allocated <i class="so-dot so-dot--blue"></i> Total size</p>
+            <h3>Children count over time</h3>
+            <svg class="so-chart" viewBox="0 0 640 160" role="img" aria-label="Child count rising from about 420 to 510">
+              <g stroke="#e2e8f0" stroke-width="1">
+                <line x1="56" y1="24" x2="610" y2="24"/>
+                <line x1="56" y1="72" x2="610" y2="72"/>
+                <line x1="56" y1="120" x2="610" y2="120"/>
+              </g>
+              <g fill="#94a3b8" font-size="11" font-family="Inter, sans-serif">
+                <text x="18" y="28">600</text>
+                <text x="18" y="76">500</text>
+                <text x="18" y="124">400</text>
+              </g>
+              <polyline fill="none" stroke="#14b8a6" stroke-width="2" points="70,104 178,98 286,90 394,80 502,62 610,40"/>
+              <g fill="#14b8a6">
+                <circle cx="70" cy="104" r="3.5"/><circle cx="178" cy="98" r="3.5"/><circle cx="286" cy="90" r="3.5"/>
+                <circle cx="394" cy="80" r="3.5"/><circle cx="502" cy="62" r="3.5"/><circle cx="610" cy="40" r="3.5"/>
+              </g>
+            </svg>
+            <h3>Top file types</h3>
+            <table class="so-table so-types">
+              <thead>
+                <tr><th>Ext</th><th>Size</th><th>Count</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>log</td>
+                  <td><span class="so-typebar"><span style="width:100%"></span></span> 3.5 GB</td>
+                  <td>408</td>
+                </tr>
+                <tr>
+                  <td>json</td>
+                  <td><span class="so-typebar"><span style="width:22%"></span></span> 780 MB</td>
+                  <td>1,204</td>
+                </tr>
+                <tr>
+                  <td>tmp</td>
+                  <td><span class="so-typebar"><span style="width:6%"></span></span> 210 MB</td>
+                  <td>86</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="speed" class="section section--border">
+    <div class="container">
+      <div class="section-header">
+        <p class="eyebrow">Speed</p>
+        <h2 class="heading-lg">1,500 directory entries/s on remote SMB.</h2>
+        <p class="text-muted">Measured while enumerating an Azure Files share over SMB. Each entry is a file or directory returned by the listing call. SMB metadata latency makes that share a slow source. A local disk or another protocol lists at a different rate.</p>
+      </div>
+      <div class="so-frame">
+        <div class="so-topbar">
+          <span class="so-brand">Storage Observer</span>
+          <span class="so-top-meta">
+            <span class="so-live">1 running</span>
+            <span class="so-pill">Daemons</span>
+            <span class="so-pill">Roots</span>
+          </span>
+        </div>
+        <div class="so-body">
+          <aside class="so-nav" aria-label="Scan progress">
+            <span>Navigate</span>
+            <span>Scan history</span>
+            <span>Summary</span>
+            <span class="so-nav-gap">Roots</span>
+            <span class="is-active">Scans</span>
+            <span>Daemons</span>
+            <span>Settings</span>
+          </aside>
+          <div class="so-main">
+            <p class="so-crumb"><span>← Back</span> app-data <span class="so-path">\\files\app-data</span></p>
+            <div class="so-table-wrap">
+              <table class="so-table so-scan">
+                <thead>
+                  <tr>
+                    <th>Started</th>
+                    <th>Completed</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th>Entries seen</th>
+                    <th>Entries/s (now)</th>
+                    <th>Entries/s (avg)</th>
+                    <th>Total size</th>
+                    <th>Error</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>10/10/2026, 9:00:00</td>
+                    <td>—</td>
+                    <td>00:45:00</td>
+                    <td><span class="so-run">Running</span></td>
+                    <td>4,050,000</td>
+                    <td>~1,520</td>
+                    <td>~1,500</td>
+                    <td>—</td>
+                    <td>—</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="so-perf">
+              <p>Performance settings</p>
+              <ul>
+                <li>Parallel walkers: <strong>8</strong></li>
+                <li>Branching depth limit: <strong>6</strong></li>
+                <li>Chunk threshold: <strong>16</strong></li>
+                <li>Chunk size: <strong>4</strong></li>
+                <li>Channel capacity: <strong>180000</strong></li>
+                <li>Max buffer entries: <strong>180000</strong></li>
+                <li>Flush interval (s): <strong>15</strong></li>
+                <li>DB batch size: <strong>4000</strong></li>
+                <li>File batch size: <strong>15000</strong></li>
+                <li>Exit flush threshold: <strong>8000</strong></li>
+                <li>Progress interval (s): <strong>4</strong></li>
+                <li>Cluster size (bytes): <strong>4096</strong></li>
+                <li>Max concurrent scans: <strong>3</strong></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--border">
+    <div class="container">
+      <div class="section-header">
+        <p class="eyebrow">Capabilities</p>
+        <h2 class="heading-lg">See everything.<br>Miss nothing.</h2>
+        <p class="text-muted">Storage Observer gives you a unified, real-time view of your file and storage landscape across any number of sources — without moving your data anywhere.</p>
+      </div>
+
+      <div class="grid-4 mb-6">
+        <div class="card card--feature-lg">
+          <div class="card-icon card-icon--violet">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+          </div>
+          <h3 class="heading-md">Multi-Source Support</h3>
+          <p class="text-sm text-muted">Local filesystems, NFS and SMB shares, SharePoint, Amazon S3, Azure Files, Azure Blob, and ADLS — all in a single view.</p>
+        </div>
+        <div class="card card--feature-lg">
+          <div class="card-icon card-icon--violet">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <h3 class="heading-md">Billions of Files</h3>
+          <p class="text-sm text-muted">Engineered from the ground up for massive scale. Whether you have millions or billions of files, Storage Observer maintains consistent performance.</p>
+        </div>
+        <div class="card card--feature-lg">
+          <div class="card-icon card-icon--violet">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
+          </div>
+          <h3 class="heading-md">Fully Self-Hosted</h3>
+          <p class="text-sm text-muted">No SaaS account, no cloud vendor dependency, no telemetry. Deploy in your own infrastructure and keep full control of your data.</p>
+        </div>
+        <div class="card card--feature-lg">
+          <div class="card-icon card-icon--violet">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <h3 class="heading-md">Optimization</h3>
+          <p class="text-sm text-muted">Optimized data refreshing based on historical usage patterns to reduce IOPS-heavy storage usage.</p>
+        </div>
+      </div>
+
+      <div class="card card--wide">
+        <h3 class="heading-md">What you can do with Storage Observer</h3>
+        <div class="grid-2 mt-6">
+          <div class="feature-row">
+            <span class="check-icon check-icon--violet"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
+            <p class="text-sm text-muted">Gain cost visibility into storage spend across all your accounts and providers</p>
+          </div>
+          <div class="feature-row">
+            <span class="check-icon check-icon--violet"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
+            <p class="text-sm text-muted">Detect orphan files and reclaim wasted storage capacity automatically</p>
+          </div>
+          <div class="feature-row">
+            <span class="check-icon check-icon--violet"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
+            <p class="text-sm text-muted">Compliance and audit trails — know what files exist, where, and since when</p>
+          </div>
+          <div class="feature-row">
+            <span class="check-icon check-icon--violet"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
+            <p class="text-sm text-muted">Monitor storage growth trends and forecast when capacity limits will be hit</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="buy" class="section section--border">
+    <div class="container">
+      <div class="grid-2">
+        <div>
+          <p class="eyebrow">Licensing</p>
+          <h2 class="heading-lg mb-6">Get Storage Observer</h2>
+          <p class="text-muted mb-6">Subscribe through Azure Marketplace. You receive access to a private container registry, where you pull container images that are already built, and a license code. Set that code in the environment variables of the deployment.</p>
+        </div>
+        <div class="purchase-options">
+          <div class="card purchase-box">
+            <p class="purchase-label">Azure Marketplace</p>
+            <p class="text-sm text-muted mb-6 text-center">Subscribe through Azure Marketplace — billed on your Azure subscription. Ideal for enterprise procurement and MACC.</p>
+            <a href="#" class="btn btn-secondary btn-primary--full">View on Azure Marketplace</a>
+            <p class="text-xs text-muted mt-6 text-center">Mutex Studio S.L. · Microsoft partner</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" class="footer-logo-link">
+        <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+      </a>
+      <p class="footer-tagline">Infrastructure tooling that fills the gaps. Self-hosted, production-grade.</p>
+    </div>
+    <div class="footer-columns">
+      <div>
+        <p class="footer-heading">Products</p>
+        <ul class="footer-links">
+          <li><a href="/azure-autoscaler/">Azure Autoscaler</a></li>
+          <li><a href="/storage-observer/">Storage Observer</a></li>
+          <li><a href="/traefik-precompiled/">Traefork</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-heading">Company</p>
+        <ul class="footer-links">
+          <li><a href="/consulting/">Consulting</a></li>
+          <li><a href="/consulting/#contact">Contact</a></li>
+          <li><a href="/traefik-precompiled/#licenses">Open Source Licenses</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Mutex Studio S.L. All rights reserved.</p>
+    <nav class="footer-legal" aria-label="Legal">
+      <a href="/privacy/">Privacy</a>
+      <a href="/cookies/">Cookies</a>
+      <a href="#" data-cookie-settings>Cookie settings</a>
+    </nav>
+    <p>MUTEX STUDIO S.L. (Sociedad Unipersonal) · NIF B05790308 · <a href="mailto:info@mutexstudio.com">info@mutexstudio.com</a></p>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js?v=3"></script>
+</body>
+</html>

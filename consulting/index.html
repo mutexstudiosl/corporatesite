@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Mutex Studio Consulting — Azure architecture, Kubernetes, and DevOps consulting from engineers who build and run infrastructure tools.">
+  <title>Consulting — Mutex Studio</title>
+
+  <link rel="icon" href="/assets/img/favicons/icon.svg?v=5" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png?v=5">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png?v=5">
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/img/favicons/favicon.ico?v=5">
+  <link rel="manifest" href="/assets/img/favicons/site.webmanifest">
+  <link rel="stylesheet" href="/assets/css/site.css?v=11">
+</head>
+
+<body class="accent-blue page-consulting">
+
+  <nav class="site-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+    </a>
+
+    <div class="nav-desktop">
+      <div class="nav-group">
+        <button type="button" class="nav-trigger" aria-haspopup="true">
+          Products
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="/azure-autoscaler/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--blue">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Azure Autoscaler</div>
+              <div class="nav-dropdown-desc">Smart resource scaling</div>
+            </div>
+          </a>
+          <a href="/storage-observer/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--violet">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Storage Observer</div>
+              <div class="nav-dropdown-desc">File storage at any scale</div>
+            </div>
+          </a>
+          <a href="/traefik-precompiled/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--emerald">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Traefork</div>
+              <div class="nav-dropdown-desc">Soft-fork, plugins compiled in</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <a href="/consulting/" class="nav-link nav-link-consulting">Consulting</a>
+    </div>
+
+    <a href="/consulting/#contact" class="nav-cta">Talk to us</a>
+
+    <button type="button" id="mobile-menu-btn" class="nav-mobile-btn" aria-label="Open menu">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="nav-mobile">
+    <p class="nav-mobile-label">Products</p>
+    <a href="/azure-autoscaler/" class="nav-mobile-link">Azure Autoscaler</a>
+    <a href="/storage-observer/" class="nav-mobile-link">Storage Observer</a>
+    <a href="/traefik-precompiled/" class="nav-mobile-link">Traefork</a>
+    <div class="nav-mobile-divider"></div>
+    <a href="/consulting/" class="nav-mobile-link">Consulting</a>
+    <a href="/consulting/#contact" class="nav-mobile-cta">Talk to us</a>
+  </div>
+</nav>
+
+  <section class="hero hero-grid">
+    <div class="hero-glow hero-glow--center"></div>
+    <div class="container hero-content">
+      <a href="/" class="hero-back">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        Back to Mutex Studio
+      </a>
+      <div class="hero-narrow">
+        <p class="eyebrow">Consulting</p>
+        <h1 class="heading-xl">
+          Azure · Kubernetes<br><span class="gradient-text">DevOps</span>
+        </h1>
+        <p class="lead">
+          We're engineers, not slide-deck consultants. We design architectures, build pipelines, and tame Kubernetes clusters — the same way we do it for our own products.
+        </p>
+        <a href="#contact" class="btn btn-primary btn-primary--lg">
+          Get in touch
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--border">
+    <div class="container">
+      <div class="section-header">
+        <p class="eyebrow">Services</p>
+        <h2 class="heading-lg">What we do</h2>
+      </div>
+      <div class="grid-3">
+        <div class="card card--feature-lg">
+          <div class="card-icon card-icon--blue">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+          </div>
+          <h3 class="heading-md">Azure Architecture</h3>
+          <ul class="service-list service-list--blue">
+            <li><span>→</span> Azure infrastructure design and review</li>
+            <li><span>→</span> Cost optimization and resource right-sizing</li>
+            <li><span>→</span> Azure SQL, MySQL, Storage architecture</li>
+            <li><span>→</span> Autoscaling strategy and implementation</li>
+            <li><span>→</span> Security, networking, and compliance</li>
+          </ul>
+        </div>
+        <div class="card card--feature-lg">
+          <div class="card-icon card-icon--violet">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+          </div>
+          <h3 class="heading-md">Kubernetes</h3>
+          <ul class="service-list service-list--violet">
+            <li><span>→</span> AKS cluster design, setup, and hardening</li>
+            <li><span>→</span> HPA, VPA, and custom autoscaling</li>
+            <li><span>→</span> Ingress, networking, and Traefik setup</li>
+            <li><span>→</span> Observability (metrics, logging, tracing)</li>
+            <li><span>→</span> Troubleshooting production incidents</li>
+          </ul>
+        </div>
+        <div class="card card--feature-lg">
+          <div class="card-icon card-icon--emerald">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          </div>
+          <h3 class="heading-md">DevOps &amp; CI/CD</h3>
+          <ul class="service-list service-list--emerald">
+            <li><span>→</span> CI/CD pipeline design and implementation</li>
+            <li><span>→</span> GitHub Actions, Azure DevOps, ArgoCD</li>
+            <li><span>→</span> Infrastructure as Code (Terraform, Bicep)</li>
+            <li><span>→</span> Container strategy and registry management</li>
+            <li><span>→</span> Developer platform and inner-loop tooling</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--border">
+    <div class="container">
+      <div class="credibility">
+        <div class="credibility-glow"></div>
+        <div class="credibility-inner">
+          <div class="credibility-stat gradient-text">We built<br>the tools</div>
+          <div>
+            <p class="text-muted text-highlight mb-6">
+              Most consultants talk about best practices. We run the infrastructure — and we've built the tools. Azure Autoscaler, Storage Observer, and Traefork are tools we created because we encountered the same problems in production for real clients.
+            </p>
+            <p class="text-muted mb-6">
+              When we help you optimize your Azure spend, design your AKS cluster, or build your CI/CD pipeline — it's based on years of hands-on production experience, not certifications.
+            </p>
+            <div class="product-pills">
+              <a href="/azure-autoscaler/" class="pill pill--blue">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+                Azure Autoscaler
+              </a>
+              <a href="/storage-observer/" class="pill pill--violet">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                Storage Observer
+              </a>
+              <a href="/traefik-precompiled/" class="pill pill--emerald">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Traefork
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section section--border">
+    <div class="container">
+      <div class="grid-2 grid-2--wide">
+        <div>
+          <p class="eyebrow">Contact</p>
+          <h2 class="heading-lg mb-6">Let's talk</h2>
+          <p class="text-muted mb-6">
+            Tell us about your project, your infrastructure, or the problem you're trying to solve. We'll get back to you within one business day.
+          </p>
+          <div class="contact-info">
+            <div class="contact-item">
+              <div class="card-icon card-icon--plain-blue card-icon--sm">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+              <div>
+                <h4 class="heading-md">Fast Response</h4>
+                <p class="text-sm text-muted">We respond within one business day — usually faster.</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="card-icon card-icon--plain-blue card-icon--sm">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/></svg>
+              </div>
+              <div>
+                <h4 class="heading-md">Remote-First</h4>
+                <p class="text-sm text-muted">We work remotely with clients across Europe and the US.</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="card-icon card-icon--plain-blue card-icon--sm">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <div>
+                <h4 class="heading-md">Serving clients globally</h4>
+                <p class="text-sm text-muted">Mutex Studio S.L. — a Spanish company working with clients around the world.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card form-card">
+          <form action="https://formspree.io/f/moqgpjke" method="POST">
+            <div class="form-group">
+              <input type="email" id="email" name="mail" required placeholder="Enter your email" class="form-input">
+            </div>
+            <div class="form-group">
+              <input type="tel" id="phone" name="tel" required placeholder="Telephone number" class="form-input">
+            </div>
+            <div class="form-group">
+              <textarea id="details" name="details" required rows="5" placeholder="Tell us more about your project" class="form-input"></textarea>
+            </div>
+            <div class="form-group"><label class="text-sm text-muted"><input type="checkbox" name="privacy_ok" required> I have read the <a href="/privacy/">privacy policy</a> and agree to my details being used to reply to me.</label></div>
+            <button type="submit" class="btn btn-primary btn-primary--full">Send</button>
+            <p class="form-note">We use your details only to reply to you. The form is delivered by Formspree, our form provider. <a href="/privacy/">Privacy policy</a></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" class="footer-logo-link">
+        <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+      </a>
+      <p class="footer-tagline">Infrastructure tooling that fills the gaps. Self-hosted, production-grade.</p>
+    </div>
+    <div class="footer-columns">
+      <div>
+        <p class="footer-heading">Products</p>
+        <ul class="footer-links">
+          <li><a href="/azure-autoscaler/">Azure Autoscaler</a></li>
+          <li><a href="/storage-observer/">Storage Observer</a></li>
+          <li><a href="/traefik-precompiled/">Traefork</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-heading">Company</p>
+        <ul class="footer-links">
+          <li><a href="/consulting/">Consulting</a></li>
+          <li><a href="/consulting/#contact">Contact</a></li>
+          <li><a href="/traefik-precompiled/#licenses">Open Source Licenses</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Mutex Studio S.L. All rights reserved.</p>
+    <nav class="footer-legal" aria-label="Legal">
+      <a href="/privacy/">Privacy</a>
+      <a href="/cookies/">Cookies</a>
+      <a href="#" data-cookie-settings>Cookie settings</a>
+    </nav>
+    <p>MUTEX STUDIO S.L. (Sociedad Unipersonal) · NIF B05790308 · <a href="mailto:info@mutexstudio.com">info@mutexstudio.com</a></p>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js?v=3"></script>
+</body>
+</html>

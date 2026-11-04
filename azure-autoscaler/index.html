@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Azure Autoscaler — Automatically scale Azure SQL, MySQL Flexible Server, PostgreSQL Flexible Server, File Shares, Elastic Pools, AKS Node Pools, Azure DevOps, and Fabric capacity based on real-time metrics.">
+  <title>Azure Autoscaler — Mutex Studio</title>
+
+  <link rel="icon" href="/assets/img/favicons/icon.svg?v=5" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png?v=5">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png?v=5">
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/img/favicons/favicon.ico?v=5">
+  <link rel="manifest" href="/assets/img/favicons/site.webmanifest">
+  <link rel="stylesheet" href="/assets/css/site.css?v=12">
+</head>
+
+<body class="accent-blue">
+
+  <nav class="site-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+    </a>
+
+    <div class="nav-desktop">
+      <div class="nav-group">
+        <button type="button" class="nav-trigger" aria-haspopup="true">
+          Products
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="/azure-autoscaler/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--blue">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Azure Autoscaler</div>
+              <div class="nav-dropdown-desc">Smart resource scaling</div>
+            </div>
+          </a>
+          <a href="/storage-observer/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--violet">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Storage Observer</div>
+              <div class="nav-dropdown-desc">File storage at any scale</div>
+            </div>
+          </a>
+          <a href="/traefik-precompiled/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--emerald">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Traefork</div>
+              <div class="nav-dropdown-desc">Soft-fork, plugins compiled in</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <a href="/consulting/" class="nav-link nav-link-consulting">Consulting</a>
+    </div>
+
+    <a href="/consulting/#contact" class="nav-cta">Talk to us</a>
+
+    <button type="button" id="mobile-menu-btn" class="nav-mobile-btn" aria-label="Open menu">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="nav-mobile">
+    <p class="nav-mobile-label">Products</p>
+    <a href="/azure-autoscaler/" class="nav-mobile-link">Azure Autoscaler</a>
+    <a href="/storage-observer/" class="nav-mobile-link">Storage Observer</a>
+    <a href="/traefik-precompiled/" class="nav-mobile-link">Traefork</a>
+    <div class="nav-mobile-divider"></div>
+    <a href="/consulting/" class="nav-mobile-link">Consulting</a>
+    <a href="/consulting/#contact" class="nav-mobile-cta">Talk to us</a>
+  </div>
+</nav>
+
+  <section class="hero hero-grid">
+    <div class="hero-glow hero-glow--center"></div>
+    <div class="container hero-content">
+      <a href="/" class="hero-back">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        Back to Mutex Studio
+      </a>
+      <div class="hero-layout">
+        <div class="hero-narrow">
+          <h1 class="heading-xl">
+            Azure <span class="gradient-text">Autoscaler</span>
+          </h1>
+          <p class="lead">
+            Stop paying workday prices all night and every weekend. Scale Azure resources to real demand, and keep the size you need when people are actually using them.
+          </p>
+          <div class="btn-row">
+            <a href="#buy" class="btn btn-primary btn-primary--lg">Get a License</a>
+          </div>
+          <div class="hero-stats">
+            <div>
+              <div class="stat-value">€846</div>
+              <div class="stat-label">saved each month, in this example</div>
+            </div>
+            <div>
+              <div class="stat-value">€10,152</div>
+              <div class="stat-label">over a year, for one database</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="savings-panel">
+          <div class="savings-panel-head">
+            <span>Example · P4 down to P1, one week</span>
+            <span class="savings-badge">−53% on the bill</span>
+          </div>
+          <svg class="savings-chart" viewBox="0 0 560 210" role="img" aria-label="Weekly cost chart for one database. The flat band is the bill if it stays at P4. The lower shape is P4 on weekday work hours and P1 at night and on the weekend. P1 costs a quarter of P4.">
+            <rect x="36" y="36" width="497" height="114" rx="6" fill="rgba(248,113,113,0.16)"/>
+            <path d="M36 121.5 L60 121.5 L60 36 L90 36 L90 121.5 L131 121.5 L131 36 L161 36 L161 121.5 L202 121.5 L202 36 L232 36 L232 121.5 L273 121.5 L273 36 L303 36 L303 121.5 L344 121.5 L344 36 L374 36 L374 121.5 L533 121.5 L533 150 L36 150 Z" fill="rgba(52,211,153,0.28)"/>
+            <path d="M36 121.5 L60 121.5 L60 36 L90 36 L90 121.5 L131 121.5 L131 36 L161 36 L161 121.5 L202 121.5 L202 36 L232 36 L232 121.5 L273 121.5 L273 36 L303 36 L303 121.5 L344 121.5 L344 36 L374 36 L374 121.5 L533 121.5" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linejoin="round"/>
+            <line x1="36" y1="150" x2="533" y2="150" stroke="#1e2a3a" stroke-width="1"/>
+            <g fill="#64748b" font-size="12" font-family="Inter, sans-serif" text-anchor="middle">
+              <text x="71" y="174">Mon</text>
+              <text x="142" y="174">Tue</text>
+              <text x="213" y="174">Wed</text>
+              <text x="284" y="174">Thu</text>
+              <text x="355" y="174">Fri</text>
+              <text x="426" y="174">Sat</text>
+              <text x="497" y="174">Sun</text>
+            </g>
+          </svg>
+          <div class="savings-legend">
+            <span><i class="swatch swatch--waste"></i> Left at P4</span>
+            <span><i class="swatch swatch--saved"></i> P4 by day, P1 at night</span>
+          </div>
+          <p class="savings-caption">A P4 database (500 DTU), left on all month, is €1,606 in West Europe. Weekdays 08:00–18:00 stay at P4 and the other hours drop to P1 (125 DTU), so the month is €760. List price, one database, no extra storage.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--border">
+    <div class="container">
+      <div class="grid-2 grid-2--wide">
+        <div>
+          <p class="eyebrow">The Problem</p>
+          <h2 class="heading-lg mb-6">Azure scales some things.<br>Not all things.</h2>
+          <p class="text-muted mb-6">
+            Critical PaaS resources on Azure are flexible but don't autoscale. You end up continuously monitoring and scaling manually — a time-consuming task that leads to overprovisioning and unnecessary cost. Or worse, the autoscaling features that do exist simply fail in edge cases.
+          </p>
+          <p class="text-muted">
+            Azure Autoscaler closes that gap with a self-hosted, containerized solution that monitors your resources and scales them intelligently — based on real-time metrics, forecasting, or defined schedules.
+          </p>
+        </div>
+
+        <div>
+          <p class="footer-heading">Supported Resources</p>
+          <div class="resource-list">
+            <div class="resource-item"><span class="check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span><div><span class="text-sm">Azure SQL Databases and Elastic Pools</span><p class="resource-dims">Databases: Dtu, MaxDataBytes. Elastic pools: Dtu, MaxDataBytes, PerDatabaseMaxCapacity.</p></div></div>
+            <div class="resource-item"><span class="check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span><div><span class="text-sm">MySQL Flexible Server</span><p class="resource-dims">Sku, CoreCount, Iops</p></div></div>
+            <div class="resource-item"><span class="check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span><div><span class="text-sm">PostgreSQL Flexible Server</span><p class="resource-dims">Sku, CoreCount, Iops</p></div></div>
+            <div class="resource-item"><span class="check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span><div><span class="text-sm">Azure File Shares</span><p class="resource-dims">ProvisionedStorage, Throughput</p></div></div>
+            <div class="resource-item"><span class="check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span><div><span class="text-sm">AKS Node Pools</span><p class="resource-dims">MinNodeCount</p></div></div>
+            <div class="resource-item"><span class="check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span><div><span class="text-sm">Azure DevOps</span><p class="resource-dims">HostedParallelJobs, PrivateParallelJobs</p></div></div>
+            <div class="resource-item"><span class="check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span><div><span class="text-sm">Microsoft Fabric Capacity</span><p class="resource-dims">Sku</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="custom-metrics" class="section section--border">
+    <div class="container">
+      <div class="section-header">
+        <p class="eyebrow">Custom metrics</p>
+        <h2 class="heading-lg">Publish the series Azure does not have.</h2>
+        <p class="text-muted">A custom metric is written into Azure Monitor and charted next to the platform metrics. Node pool node count. On Azure SQL, replica DTU, memory, and replica latency. The rule then reads those series the same way it reads <code class="inline-code">dtu_used</code>.</p>
+      </div>
+      <div class="metric-panel">
+        <p class="metric-panel-title">replica_dtu_used and dtu_used</p>
+        <svg class="metric-chart" viewBox="0 0 640 180" role="img" aria-label="Example chart with replica DTU below primary DTU, both spiking at the same times">
+          <g stroke="#1e293b" stroke-width="1">
+            <line x1="48" y1="24" x2="620" y2="24"/>
+            <line x1="48" y1="68" x2="620" y2="68"/>
+            <line x1="48" y1="112" x2="620" y2="112"/>
+            <line x1="48" y1="148" x2="620" y2="148"/>
+          </g>
+          <g fill="#64748b" font-size="11" font-family="ui-monospace, monospace">
+            <text x="8" y="28">60</text>
+            <text x="8" y="72">40</text>
+            <text x="8" y="116">20</text>
+            <text x="16" y="152">0</text>
+          </g>
+          <polyline fill="none" stroke="#e879f9" stroke-width="2" points="48,146 120,146 150,28 170,140 230,120 280,100 330,108 380,90 430,70 470,146 520,64 560,146 600,144 620,146"/>
+          <polyline fill="none" stroke="#38bdf8" stroke-width="2" points="48,146 120,146 150,108 170,144 230,140 280,132 330,136 380,128 430,120 470,146 520,90 560,146 600,146 620,146"/>
+        </svg>
+        <p class="metric-legend"><i class="swatch" style="background:#38bdf8"></i> replica_dtu_used <i class="swatch" style="background:#e879f9"></i> dtu_used <span>Example. The replica series is custom. dtu_used is the platform metric.</span></p>
+      </div>
+      <div class="config-block">
+        <h3 class="heading-md">Lambdas in the rule</h3>
+        <p class="text-sm text-muted">Transform and ScaleTarget are C# lambdas. This one reads FileCapacity, converts the average to GB, and sets provisioned storage to that plus 50 GB.</p>
+        <pre class="config-yaml"><code>ScalingConfigurations:
+  Baseline:
+    Metrics:
+      FileCapacity:
+        Name: FileCapacity
+        ResourceId: "/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Storage/storageAccounts/${storageAccountName}/fileServices/default"
+        Window: 02:00:00
+        TimeGrain: 01:00:00
+        SplitName: "FileShare"
+        SplitValue: "${fileShareName}"
+        Aggregations: ["Average"]
+        Transform: "(value) =&gt; value.SetAverage(value.Average / (1000 * 1000 * 1000))" # Convert to Gb
+    TimeWindow:
+      Days: All
+      Months: All
+      StartTime: "00:00"
+      EndTime: "23:59"
+      TimeZone: UTC
+    ScalingRules:
+      fixed:
+        ScalingStrategy: Fixed
+        Dimension: ProvisionedStorage
+        # Fixed +50 GB above whatever is being used
+        ScaleTarget: "(data) =&gt; (data.Metrics[\"FileCapacity\"].Values.First().Average + 50).ToString()"
+        DimensionValueCeilingStep: "1"  # Round up to nearest GB
+        DimensionValueMin: "100"  # Minimum 100 GB for Azure Files</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--border">
+    <div class="container">
+      <div class="section-header section-header--sm">
+        <p class="eyebrow">Features</p>
+        <h2 class="heading-lg">Smart scaling, zero babysitting</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card card--feature">
+          <div class="card-icon card-icon--plain-blue card-icon--sm">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01"/></svg>
+          </div>
+          <h3 class="heading-md">Self-Hosted</h3>
+          <p class="text-sm text-muted">Runs as a containerized application in your AKS cluster or Azure Container Services. Your data never leaves your environment.</p>
+        </div>
+        <div class="card card--feature">
+          <div class="card-icon card-icon--plain-blue card-icon--sm">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </div>
+          <h3 class="heading-md">Schedule-Based Scaling</h3>
+          <p class="text-sm text-muted">Scale up before business hours, scale down overnight. Define schedules that match your real traffic patterns and save money when resources are idle.</p>
+        </div>
+        <div class="card card--feature">
+          <div class="card-icon card-icon--plain-blue card-icon--sm">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          </div>
+          <h3 class="heading-md">Flexible Metric Analysis</h3>
+          <p class="text-sm text-muted">Write custom scaling rules using Lambda expressions evaluated against real-time Azure Monitor metrics. Total control without code changes.</p>
+        </div>
+        <div class="card card--feature">
+          <div class="card-icon card-icon--plain-blue card-icon--sm">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <h3 class="heading-md">Usage Forecasting</h3>
+          <p class="text-sm text-muted">Custom forecasting algorithms predict future demand and scale proactively — before load spikes cause degraded performance.</p>
+        </div>
+        <div class="card card--feature span-2">
+          <div class="card-icon card-icon--plain-blue card-icon--sm">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+          </div>
+          <h3 class="heading-md">Multidimensional Scaling</h3>
+          <p class="text-sm text-muted">Target multiple dimensions for the same resource — CPU, memory, IOPS, available storage. The system automatically picks the best available SKU or scales each dimension independently when the resource supports it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works" class="section section--border">
+    <div class="container">
+      <div class="section-header text-center">
+        <p class="eyebrow">Getting Started</p>
+        <h2 class="heading-lg">Deploy and forget</h2>
+        <p class="text-muted max-w-xl">Deploy the containerized solution, grant permissions, and let it run.</p>
+      </div>
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-number step-number--blue">1</div>
+          <h3 class="heading-md">Create your configuration</h3>
+          <p class="text-sm text-muted">Define your scaling rules and resources. Monitor the autoscaler in dry-run mode before going live.</p>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step-card">
+          <div class="step-number step-number--violet">2</div>
+          <h3 class="heading-md">Turn on autoscaling</h3>
+          <p class="text-sm text-muted">Enable the solution and forget about manually scaling or babysitting your resources ever again.</p>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step-card">
+          <div class="step-number step-number--emerald">3</div>
+          <h3 class="heading-md">Monitor and optimize</h3>
+          <p class="text-sm text-muted">Watch your resources scale automatically. Track cost savings and performance improvements over time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="buy" class="section section--border">
+    <div class="container">
+      <div class="grid-2">
+        <div>
+          <p class="eyebrow">Licensing</p>
+          <h2 class="heading-lg mb-6">Get Azure Autoscaler</h2>
+          <p class="text-muted mb-6">Pay with PayPal or subscribe through Azure Marketplace. You receive access to a private container registry, where you pull container images that are already built, and a license code. Set that code in the environment variables of the deployment.</p>
+          <p class="text-muted mb-6">Or only pay for what you save. We deploy Azure Autoscaler with you. For 12 months the fee is 50% of the Azure spend you save. After that, regular licensing.</p>
+        </div>
+        <div class="purchase-options">
+          <div class="card purchase-box">
+            <p class="purchase-label">Consulting</p>
+            <p class="text-sm text-muted mb-6 text-center">Only pay for what you save. We help you deploy. For 12 months the fee is 50% of the Azure spend you save, then regular licensing.</p>
+            <a href="/consulting/#contact" class="btn btn-primary btn-primary--full">Get in touch</a>
+          </div>
+          <div class="card purchase-box">
+            <p class="purchase-label">PayPal</p>
+            <p class="text-sm text-muted mb-6 text-center">Secure one-time checkout</p>
+            <div id="paypal-container-L8PPM27WKB8SJ" class="paypal-container"></div>
+            <button type="button" class="btn btn-secondary btn-primary--full" data-paypal-load>Pay with PayPal</button>
+            <p class="text-xs text-muted mt-6 text-center">PayPal loads only when you click. It may set its own cookies, see the <a href="/cookies/">cookie policy</a>.</p>
+            <p class="text-xs text-muted mt-6 text-center">One-time purchase · EUR · Self-hosted deployment</p>
+          </div>
+          <div class="card purchase-box">
+            <p class="purchase-label">Azure Marketplace</p>
+            <p class="text-sm text-muted mb-6 text-center">Subscribe through Azure Marketplace — billed on your Azure subscription. Ideal for enterprise procurement and MACC.</p>
+            <a href="#" class="btn btn-secondary btn-primary--full">View on Azure Marketplace</a>
+            <p class="text-xs text-muted mt-6 text-center">Mutex Studio S.L. · Microsoft partner</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" class="footer-logo-link">
+        <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+      </a>
+      <p class="footer-tagline">Infrastructure tooling that fills the gaps. Self-hosted, production-grade.</p>
+    </div>
+    <div class="footer-columns">
+      <div>
+        <p class="footer-heading">Products</p>
+        <ul class="footer-links">
+          <li><a href="/azure-autoscaler/">Azure Autoscaler</a></li>
+          <li><a href="/storage-observer/">Storage Observer</a></li>
+          <li><a href="/traefik-precompiled/">Traefork</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-heading">Company</p>
+        <ul class="footer-links">
+          <li><a href="/consulting/">Consulting</a></li>
+          <li><a href="/consulting/#contact">Contact</a></li>
+          <li><a href="/traefik-precompiled/#licenses">Open Source Licenses</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Mutex Studio S.L. All rights reserved.</p>
+    <nav class="footer-legal" aria-label="Legal">
+      <a href="/privacy/">Privacy</a>
+      <a href="/cookies/">Cookies</a>
+      <a href="#" data-cookie-settings>Cookie settings</a>
+    </nav>
+    <p>MUTEX STUDIO S.L. (Sociedad Unipersonal) · NIF B05790308 · <a href="mailto:info@mutexstudio.com">info@mutexstudio.com</a></p>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js?v=3"></script>
+</body>
+</html>
