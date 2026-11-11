@@ -1424,8 +1424,7 @@ code.inline-code {
   gap: 1.5rem;
 }
 
-.purchase-box,
-.paypal-box {
+.purchase-box {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1441,11 +1440,6 @@ code.inline-code {
   color: var(--color-blue);
 }
 
-.paypal-container {
-  min-width: 200px;
-  width: 100%;
-  max-width: 400px;
-}
 
 /* Utility */
 .span-2 { grid-column: span 2; }

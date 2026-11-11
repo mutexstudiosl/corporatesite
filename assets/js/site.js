@@ -12,11 +12,6 @@
       event.preventDefault();
       showBanner();
     }
-    var pp = event.target.closest('[data-paypal-load]');
-    if (pp) {
-      event.preventDefault();
-      loadPayPal(pp);
-    }
   });
 
   function getConsent() {
@@ -51,23 +46,6 @@
         document.cookie = n + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
       }
     });
-  }
-
-  function loadPayPal(btn) {
-    var holder = btn.parentNode;
-    btn.disabled = true;
-    btn.textContent = 'Loading PayPal…';
-    var s = document.createElement('script');
-    s.src = 'https://www.paypal.com/sdk/js?client-id=BAAWrTHlRByFj4h9ML7M7JASrE-JZIH0MYmMZeUEhREdtGr39JyShmv8cSKjnKyKBwaHtdLWuKUdUxxnBE&components=hosted-buttons&disable-funding=venmo&currency=EUR';
-    s.onload = function () {
-      btn.remove();
-      window.paypal.HostedButtons({ hostedButtonId: 'L8PPM27WKB8SJ' }).render('#paypal-container-L8PPM27WKB8SJ');
-    };
-    s.onerror = function () {
-      btn.disabled = false;
-      btn.textContent = 'Could not load PayPal. Try again';
-    };
-    holder.appendChild(s);
   }
 
   function showBanner() {
