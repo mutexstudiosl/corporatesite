@@ -4,7 +4,7 @@
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Storage Observer finds the folders that hold your data. Scan local disks, network shares, SharePoint, S3, and Azure storage, then see each path's size, cost, and growth. Self-hosted.">
+  <meta name="description" content="Storage Observer scans local disks, network shares, SharePoint, S3, Azure Files and Blob storage and shows which folders use the space, what they cost and how they have grown. It is self-hosted.">
   <title>Storage Observer — Mutex Studio</title>
 
   <link rel="icon" href="/assets/img/favicons/icon.svg?v=5" type="image/svg+xml">
@@ -95,11 +95,11 @@
           Storage <span class="gradient-text">Observer</span>
         </h1>
         <p class="lead">
-          Capacity is a single number. It doesn't tell you which folder is using it. Scan local disks, network shares, SharePoint, S3, Azure Files, and Blob storage, <strong>then see which path is using the space, what it costs, and how that folder grew.</strong>
+          Storage Observer scans local disks, network shares, SharePoint, S3, Azure Files and Blob storage <strong>and shows which folders use the space, what they cost and how they have grown.</strong>
         </p>
         <div class="badge badge--violet mb-6">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01"/></svg>
-          Self-hosted. The scan runs next to the files.
+          Self-hosted: each scan runs on a machine next to the storage it reads.
         </div>
         <a href="#buy" class="btn btn-primary btn-primary--lg">Buy now</a>
       </div>
@@ -110,7 +110,7 @@
     <div class="container">
       <div class="section-header">
         <p class="eyebrow">How it works</p>
-        <h2 class="heading-lg">A daemon next to each source.<br>One screen for all your storage.</h2>
+        <h2 class="heading-lg">A daemon at each storage source<br>reports to one central server</h2>
         <p class="text-muted max-w-3xl">Each daemon runs next to the storage it scans: local disks, network shares, SharePoint, AWS, or Azure. It reports usage to a central server, and the UI shows how much each source uses.</p>
       </div>
       <div class="arch">
@@ -184,8 +184,8 @@
     <div class="container">
       <div class="section-header">
         <p class="eyebrow">Roots</p>
-        <h2 class="heading-lg">Files, capacity, and cost.</h2>
-        <p class="text-muted">How much each scan root uses, and what that storage costs per month.</p>
+        <h2 class="heading-lg">Usage and monthly cost for each scan root</h2>
+        <p class="text-muted">The Roots page lists every configured scan root with its file and folder counts, used space, capacity, and monthly storage and snapshot cost.</p>
       </div>
       <div class="so-frame">
         <div class="so-topbar">
@@ -287,8 +287,8 @@
     <div class="container">
       <div class="section-header">
         <p class="eyebrow">Navigation</p>
-        <h2 class="heading-lg">Direct children, or the whole subtree.</h2>
-        <p class="text-muted">A folder can report 300 GB and hold only 12 files; the rest is further down. Each row separates what sits directly in the folder (direct files and direct folders) from the totals for the whole tree below it, including empty folders. Sort by direct children to skip past folders that only pass the size through.</p>
+        <h2 class="heading-lg">Folder sizes split into direct contents and subtree totals</h2>
+        <p class="text-muted">A folder that reports 300 GB may contain only 12 files directly, with the rest of the data in its subfolders. Each row separates what sits directly in the folder (direct files and direct folders) from the totals for the whole tree below it, including empty folders. Sorting by direct children lists folders that hold data themselves ahead of folders whose size comes only from their subfolders.</p>
       </div>
       <div class="so-frame">
         <div class="so-topbar">
@@ -408,8 +408,8 @@
     <div class="container">
       <div class="section-header">
         <p class="eyebrow">History</p>
-        <h2 class="heading-lg">Folder growth over time.</h2>
-        <p class="text-muted">Size and child count for any folder, from the first scan to the latest.</p>
+        <h2 class="heading-lg">Size history for each folder</h2>
+        <p class="text-muted">The History tab charts a folder's size and number of children for every scan since the first one, and lists the file types that use the most space.</p>
       </div>
       <div class="so-frame">
         <div class="so-topbar">
@@ -519,7 +519,7 @@
     <div class="container">
       <div class="section-header">
         <p class="eyebrow">Speed</p>
-        <h2 class="heading-lg">1,500 directory entries/s on remote SMB.</h2>
+        <h2 class="heading-lg">Scan speed: about 1,500 directory entries per second over SMB</h2>
         <p class="text-muted">Measured while listing an Azure Files share over SMB, where each entry is one file or directory returned by the listing call. SMB metadata latency makes this a slow source; local disks and other protocols list at different rates.</p>
       </div>
       <div class="so-frame">
@@ -601,8 +601,8 @@
     <div class="container">
       <div class="section-header">
         <p class="eyebrow">Capabilities</p>
-        <h2 class="heading-lg">All your storage.<br>One place to look.</h2>
-        <p class="text-muted">Storage Observer brings files and storage from any number of sources into one real-time view, without moving your data.</p>
+        <h2 class="heading-lg">Supported sources, scale<br>and deployment</h2>
+        <p class="text-muted">Storage Observer shows the results from any number of storage sources in one real-time view. Your files are not copied or moved.</p>
       </div>
 
       <div class="grid-4 mb-6">
@@ -610,28 +610,28 @@
           <div class="card-icon card-icon--violet">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
           </div>
-          <h3 class="heading-md">Many sources, one view</h3>
-          <p class="text-sm text-muted">Local filesystems, NFS and SMB shares, SharePoint, Amazon S3, Azure Files, Azure Blob, and ADLS, all side by side.</p>
+          <h3 class="heading-md">Supported sources</h3>
+          <p class="text-sm text-muted">Local filesystems, NFS and SMB shares, SharePoint, Amazon S3, Azure Files, Azure Blob and ADLS, shown in the same interface.</p>
         </div>
         <div class="card card--feature-lg">
           <div class="card-icon card-icon--violet">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           </div>
           <h3 class="heading-md">Billions of files</h3>
-          <p class="text-sm text-muted">Designed for very large file counts. Performance stays consistent whether a source holds millions of files or billions.</p>
+          <p class="text-sm text-muted">Designed for sources with billions of files. Scan performance stays consistent as the file count grows.</p>
         </div>
         <div class="card card--feature-lg">
           <div class="card-icon card-icon--violet">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
           </div>
           <h3 class="heading-md">Fully self-hosted</h3>
-          <p class="text-sm text-muted">No SaaS account, no dependency on a cloud vendor, no telemetry. Deploy it on your own infrastructure and keep full control of your data.</p>
+          <p class="text-sm text-muted">Storage Observer runs on your own infrastructure and sends no telemetry. It doesn't need a SaaS account or depend on any cloud vendor, so your data stays under your control.</p>
         </div>
         <div class="card card--feature-lg">
           <div class="card-icon card-icon--violet">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
           </div>
-          <h3 class="heading-md">Lighter on IOPS</h3>
+          <h3 class="heading-md">Fewer IOPS on rescans</h3>
           <p class="text-sm text-muted">Refreshes are tuned to historical usage patterns, which cuts the IOPS spent rescanning storage.</p>
         </div>
       </div>

@@ -96,7 +96,7 @@
             Azure <span class="gradient-text">Autoscaler</span>
           </h1>
           <p class="lead">
-            Stop paying workday prices all night and every weekend. Scale Azure resources to real demand, and keep the size you need for the hours people actually use them.
+            Azure Autoscaler resizes Azure SQL databases and elastic pools, MySQL and PostgreSQL servers, file shares, AKS node pools, Azure DevOps parallel jobs and Fabric capacity based on metrics, forecasts or schedules. For example, it can keep a database at a large tier during working hours and move it to a smaller one at night and on weekends.
           </p>
           <div class="btn-row">
             <a href="https://marketplace.microsoft.com/en-us/product/mutex-studio-sl.resourceautoscaler?tab=Overview" class="btn btn-primary btn-primary--lg" target="_blank" rel="noopener">Get it on Azure Marketplace</a>
@@ -140,7 +140,7 @@
             <span><i class="swatch swatch--waste"></i> Left at P4</span>
             <span><i class="swatch swatch--saved"></i> P4 by day, P1 at night</span>
           </div>
-          <p class="savings-caption">A P4 database (500 DTU) left running all month costs €1,606 in West Europe. Keep it at P4 on weekdays from 08:00 to 18:00, drop it to P1 (125 DTU) the rest of the time, and the month costs €760. List prices, one database, no extra storage.</p>
+          <p class="savings-caption">A P4 database (500 DTU) left running all month costs €1,606 in West Europe. Keep it at P4 on weekdays from 08:00 to 18:00, drop it to P1 (125 DTU) the rest of the time, and the month costs €760. Prices are list prices for one database without extra storage.</p>
         </div>
       </div>
     </div>
@@ -151,12 +151,12 @@
       <div class="grid-2 grid-2--wide">
         <div>
           <p class="eyebrow">The problem</p>
-          <h2 class="heading-lg mb-6">Azure scales some resources.<br>Not all of them.</h2>
+          <h2 class="heading-lg mb-6">Many Azure PaaS resources<br>have no built-in autoscaling</h2>
           <p class="text-muted mb-6">
-            Many critical Azure PaaS resources can be resized, but Azure won't resize them for you. Someone has to watch the metrics and change the size by hand, which takes time and usually ends in overprovisioning and wasted money. Where autoscaling does exist, it can fail in edge cases.
+            Many Azure PaaS resources can be resized, but Azure has no setting that resizes them automatically. Someone has to watch the metrics and change the size by hand, which takes time, so most teams provision for peak load and pay for that size around the clock. Where Azure does offer autoscaling, it can fail in edge cases.
           </p>
           <p class="text-muted">
-            Azure Autoscaler closes that gap. It runs as a self-hosted container, watches your resources, and scales them based on real-time metrics, forecasts, or schedules you define.
+            Azure Autoscaler runs as a container in your own environment. It reads the metrics of the resources you configure and changes their size based on those metrics, on forecasts or on schedules you define.
           </p>
         </div>
 
@@ -180,7 +180,7 @@
     <div class="container">
       <div class="section-header">
         <p class="eyebrow">Custom metrics</p>
-        <h2 class="heading-lg">Publish the metrics Azure doesn't have.</h2>
+        <h2 class="heading-lg">Scale on metrics that Azure doesn't publish</h2>
         <p class="text-muted">Custom metrics are written to Azure Monitor and charted next to the platform metrics. Examples: node count for an AKS node pool, and replica DTU, memory, and replica latency for Azure SQL. Scaling rules read these series the same way they read <code class="inline-code">dtu_used</code>.</p>
       </div>
       <div class="metric-panel">
@@ -240,7 +240,7 @@
     <div class="container">
       <div class="section-header section-header--sm">
         <p class="eyebrow">Features</p>
-        <h2 class="heading-lg">Scaling you don't have to watch</h2>
+        <h2 class="heading-lg">How Azure Autoscaler scales resources</h2>
       </div>
       <div class="grid-2">
         <div class="card card--feature">
@@ -255,14 +255,14 @@
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
           </div>
           <h3 class="heading-md">Schedule-based scaling</h3>
-          <p class="text-sm text-muted">Scale up before business hours and down overnight. Set schedules that match your real traffic and stop paying for capacity nobody is using.</p>
+          <p class="text-sm text-muted">Scale up before business hours and down overnight. Define time windows that match your traffic, so you don't pay for capacity outside the hours it is used.</p>
         </div>
         <div class="card card--feature">
           <div class="card-icon card-icon--plain-blue card-icon--sm">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
           </div>
           <h3 class="heading-md">Flexible metric rules</h3>
-          <p class="text-sm text-muted">Write scaling rules as C# lambda expressions evaluated against real-time Azure Monitor metrics. You get full control without changing the autoscaler's code.</p>
+          <p class="text-sm text-muted">Write scaling rules as C# lambda expressions evaluated against real-time Azure Monitor metrics. To change how a resource scales, you edit its rule in the configuration file, and the autoscaler's code stays the same.</p>
         </div>
         <div class="card card--feature">
           <div class="card-icon card-icon--plain-blue card-icon--sm">
@@ -286,8 +286,8 @@
     <div class="container">
       <div class="section-header text-center">
         <p class="eyebrow">Getting started</p>
-        <h2 class="heading-lg">Three steps to production</h2>
-        <p class="text-muted max-w-xl">Deploy the container, grant it the permissions it needs, and let it run.</p>
+        <h2 class="heading-lg">How to deploy it</h2>
+        <p class="text-muted max-w-xl">Deploy the container and grant it permission to read metrics and change the size of the resources you configure.</p>
       </div>
       <div class="steps">
         <div class="step-card">
@@ -299,13 +299,13 @@
         <div class="step-card">
           <div class="step-number step-number--violet">2</div>
           <h3 class="heading-md">Turn on autoscaling</h3>
-          <p class="text-sm text-muted">Enable it. Nobody has to resize those resources by hand anymore.</p>
+          <p class="text-sm text-muted">Turn off dry-run mode so the autoscaler applies the changes. From then on, nobody has to resize these resources by hand.</p>
           <div class="step-connector"></div>
         </div>
         <div class="step-card">
           <div class="step-number step-number--emerald">3</div>
           <h3 class="heading-md">Monitor and optimize</h3>
-          <p class="text-sm text-muted">Watch your resources scale on their own, and track savings and performance over time.</p>
+          <p class="text-sm text-muted">Check how the resources scale, and track savings and performance over time.</p>
         </div>
       </div>
     </div>
@@ -318,7 +318,7 @@
           <p class="eyebrow">Licensing</p>
           <h2 class="heading-lg mb-6">Get Azure Autoscaler</h2>
           <p class="text-muted mb-6">Buy it on Microsoft Azure Marketplace and deploy it in your subscription. You get a license code and access to a private container registry with prebuilt images. Set the license code as an environment variable in your deployment.</p>
-          <p class="text-muted mb-6">Or pay only for what you save. We deploy Azure Autoscaler with you, and for the first 12 months our fee is 50% of the Azure spend you save. After that, standard licensing applies.</p>
+          <p class="text-muted mb-6">There is also a savings-based option: we deploy Azure Autoscaler with you, and for the first 12 months our fee is 50% of the Azure spend you save. After that, standard licensing applies.</p>
         </div>
         <div class="purchase-options">
           <div class="card purchase-box">

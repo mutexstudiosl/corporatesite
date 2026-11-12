@@ -108,12 +108,12 @@
       <div class="grid-2 grid-2--wide">
         <div>
           <p class="eyebrow">The fork</p>
-          <h2 class="heading-lg mb-6">Plugins compiled into Traefik.</h2>
+          <h2 class="heading-lg mb-6">Why Traefork compiles plugins into Traefik</h2>
           <p class="text-muted mb-6">
-            Traefik runs community middleware plugins through Yaegi, a Go interpreter. That middleware runs on every request, which puts the interpreter on the hot path: more memory, more CPU, and profiles that don't show the plugin code.
+            Traefik runs community middleware plugins through Yaegi, a Go interpreter. That middleware runs on every request, so the interpreter sits on the hot path. It uses more memory and CPU than compiled code, and CPU profiles don't show the plugin code.
           </p>
           <p class="text-muted">
-            Traefork tracks the upstream tree and compiles the extra plugins into the binary, without changing the plugin source. Upstream chose not to ship this workflow.
+            Traefork tracks the upstream tree and compiles the extra plugins into the binary, without changing the plugin source. The Traefik project chose not to include this build workflow, so Traefork maintains it.
           </p>
         </div>
 
@@ -146,7 +146,7 @@
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
               </div>
               <div>
-                <h3 class="heading-md">Tested as a set</h3>
+                <h3 class="heading-md">Tested before each release</h3>
                 <p class="text-sm text-muted">Before an image is published, it is tested with the compiled-in middleware, including a comparison against the same stacks running under Yaegi.</p>
               </div>
             </div>
@@ -160,8 +160,8 @@
     <div class="container">
       <div class="section-header section-header--sm">
         <p class="eyebrow">What's included</p>
-        <h2 class="heading-lg">Upstream Traefik, plus these plugins.</h2>
-        <p class="text-muted max-w-2xl">All compiled into the binary. Each release pins the upstream Traefik version and the version of each plugin.</p>
+        <h2 class="heading-lg">Plugins included in each image</h2>
+        <p class="text-muted max-w-2xl">Every plugin below is compiled into the binary. Each release pins the upstream Traefik version and the version of each plugin.</p>
       </div>
       <div class="grid-included">
         <div class="included-item"><p class="title">Traefik core</p><p class="desc">Upstream proxy, kept in sync</p></div>
@@ -178,8 +178,8 @@
     <div class="container">
       <div class="section-header section-header--sm">
         <p class="eyebrow">Instead of Front Door</p>
-        <h2 class="heading-lg">Switch for the request handling, not the bandwidth.</h2>
-        <p class="text-muted max-w-3xl">The reason to move is what Traefork does with each request: routing, certificates, and a security stack compiled into the ingress. Bandwidth costs about the same either way. In Europe, under 10 TB, a gigabyte out of Front Door’s edge is $0.083, and a gigabyte out of a virtual machine with routing preference Internet is $0.08.</p>
+        <h2 class="heading-lg">Traefork compared with Azure Front Door Premium</h2>
+        <p class="text-muted max-w-3xl">The main differences are in how each request is handled: routing, certificates and the security middleware, which in Traefork is compiled into the ingress. Bandwidth costs about the same with either option. In Europe, under 10 TB, a gigabyte out of Front Door’s edge is $0.083, and a gigabyte out of a virtual machine with routing preference Internet is $0.08.</p>
       </div>
 
       <div class="door-arch">
@@ -196,7 +196,7 @@
             </ul>
           </div>
           <div class="door-flow" aria-hidden="true"></div>
-          <div class="door-box"><strong>Kubernetes origin</strong><ul><li>The cluster is a backend. The route, the certificate, and the WAF live in another control plane.</li></ul></div>
+          <div class="door-box"><strong>Kubernetes origin</strong><ul><li>The cluster is only a backend. The route, the certificate and the WAF are configured in the Front Door profile, a separate control plane.</li></ul></div>
         </div>
         <div class="door-col door-col--fork">
           <p class="door-kicker">Traefork</p>
@@ -205,9 +205,9 @@
           <div class="door-box">
             <strong>One node in the cluster</strong>
             <ul>
-              <li><span>Routing</span> Host, path, headers, method, query. Weight, mirror, TCP.</li>
+              <li><span>Routing</span> Matches host, path, headers, method and query, and supports weighted, mirrored and TCP services.</li>
               <li><span>Certificates</span> ACME on the route, including a DNS-01 wildcard.</li>
-              <li><span>Security</span> Rate limit, then ModSecurity, then CrowdSec. Compiled in.</li>
+              <li><span>Security</span> Rate limiting, ModSecurity and CrowdSec, in that order, compiled into the binary.</li>
             </ul>
           </div>
           <div class="door-flow" aria-hidden="true"></div>
@@ -232,7 +232,7 @@
 
       <div class="section-header section-header--sm">
         <p class="eyebrow">The bill</p>
-        <h2 class="heading-lg">A quarter of the Front Door bill.</h2>
+        <h2 class="heading-lg">Monthly cost: about a quarter of Front Door Premium</h2>
         <p class="text-muted max-w-3xl">Take five million requests a day with responses of about 4 KB. That is 600 GB out per month. Front Door Premium comes to $607.80 and Traefork to $143.58. The Front Door profile costs $330 a month for as long as it exists, and every million requests costs $1.50, including requests the WAF blocks. Those two meters add up to $555. Traffic from the edge back to the origin is $3. Traffic out to clients is $49.80 from the edge and $40 from the node.</p>
       </div>
       <div class="table-wrap">
