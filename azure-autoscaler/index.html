@@ -4,7 +4,7 @@
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Azure Autoscaler — Automatically scale Azure SQL, MySQL Flexible Server, PostgreSQL Flexible Server, File Shares, Elastic Pools, AKS Node Pools, Azure DevOps, and Fabric capacity based on real-time metrics.">
+  <meta name="description" content="Azure Autoscaler scales Azure SQL databases and elastic pools, MySQL Flexible Server, PostgreSQL Flexible Server, Azure file shares, AKS node pools, Azure DevOps, and Fabric capacity based on real-time metrics.">
   <title>Azure Autoscaler — Mutex Studio</title>
 
   <link rel="icon" href="/assets/img/favicons/icon.svg?v=5" type="image/svg+xml">
@@ -96,14 +96,14 @@
             Azure <span class="gradient-text">Autoscaler</span>
           </h1>
           <p class="lead">
-            Stop paying workday prices all night and every weekend. Scale Azure resources to real demand, and keep the size you need when people are actually using them.
+            Stop paying workday prices all night and every weekend. Scale Azure resources to real demand, and keep the size you need for the hours people actually use them.
           </p>
           <div class="btn-row">
             <a href="https://marketplace.microsoft.com/en-us/product/mutex-studio-sl.resourceautoscaler?tab=Overview" class="btn btn-primary btn-primary--lg" target="_blank" rel="noopener">Get it on Azure Marketplace</a>
             <a href="https://github.com/david-garcia-garcia/azureautoscaler" class="btn btn-secondary btn-primary--lg" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/></svg>View on GitHub</a>
             <a href="/consulting/#contact" class="btn btn-secondary btn-primary--lg">Talk to us</a>
           </div>
-          <p class="marketplace-note">Available on Microsoft Azure Marketplace: buy and deploy directly from your Azure subscription, billed through Azure.</p>
+          <p class="marketplace-note">Available on Microsoft Azure Marketplace. Buy and deploy it from your Azure subscription, billed through Azure.</p>
           <div class="hero-stats">
             <div>
               <div class="stat-value">€846</div>
@@ -140,7 +140,7 @@
             <span><i class="swatch swatch--waste"></i> Left at P4</span>
             <span><i class="swatch swatch--saved"></i> P4 by day, P1 at night</span>
           </div>
-          <p class="savings-caption">A P4 database (500 DTU), left on all month, is €1,606 in West Europe. Weekdays 08:00–18:00 stay at P4 and the other hours drop to P1 (125 DTU), so the month is €760. List price, one database, no extra storage.</p>
+          <p class="savings-caption">A P4 database (500 DTU) left running all month costs €1,606 in West Europe. Keep it at P4 on weekdays from 08:00 to 18:00, drop it to P1 (125 DTU) the rest of the time, and the month costs €760. List prices, one database, no extra storage.</p>
         </div>
       </div>
     </div>
@@ -150,18 +150,18 @@
     <div class="container">
       <div class="grid-2 grid-2--wide">
         <div>
-          <p class="eyebrow">The Problem</p>
-          <h2 class="heading-lg mb-6">Azure scales some things.<br>Not all things.</h2>
+          <p class="eyebrow">The problem</p>
+          <h2 class="heading-lg mb-6">Azure scales some resources.<br>Not all of them.</h2>
           <p class="text-muted mb-6">
-            Critical PaaS resources on Azure are flexible but don't autoscale. You end up continuously monitoring and scaling manually — a time-consuming task that leads to overprovisioning and unnecessary cost. Or worse, the autoscaling features that do exist simply fail in edge cases.
+            Many critical Azure PaaS resources can be resized, but Azure won't resize them for you. Someone has to watch the metrics and change the size by hand, which takes time and usually ends in overprovisioning and wasted money. Where autoscaling does exist, it can fail in edge cases.
           </p>
           <p class="text-muted">
-            Azure Autoscaler closes that gap with a self-hosted, containerized solution that monitors your resources and scales them intelligently — based on real-time metrics, forecasting, or defined schedules.
+            Azure Autoscaler closes that gap. It runs as a self-hosted container, watches your resources, and scales them based on real-time metrics, forecasts, or schedules you define.
           </p>
         </div>
 
         <div>
-          <p class="footer-heading">Supported Resources</p>
+          <p class="footer-heading">Supported resources</p>
           <div class="resource-list">
             <div class="resource-item"><span class="check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span><div><span class="text-sm">Azure SQL Databases and Elastic Pools</span><p class="resource-dims">Databases: Dtu, MaxDataBytes. Elastic pools: Dtu, MaxDataBytes, PerDatabaseMaxCapacity.</p></div></div>
             <div class="resource-item"><span class="check-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span><div><span class="text-sm">MySQL Flexible Server</span><p class="resource-dims">Sku, CoreCount, Iops</p></div></div>
@@ -180,12 +180,12 @@
     <div class="container">
       <div class="section-header">
         <p class="eyebrow">Custom metrics</p>
-        <h2 class="heading-lg">Publish the series Azure does not have.</h2>
-        <p class="text-muted">A custom metric is written into Azure Monitor and charted next to the platform metrics. Node pool node count. On Azure SQL, replica DTU, memory, and replica latency. The rule then reads those series the same way it reads <code class="inline-code">dtu_used</code>.</p>
+        <h2 class="heading-lg">Publish the metrics Azure doesn't have.</h2>
+        <p class="text-muted">Custom metrics are written to Azure Monitor and charted next to the platform metrics. Examples: node count for an AKS node pool, and replica DTU, memory, and replica latency for Azure SQL. Scaling rules read these series the same way they read <code class="inline-code">dtu_used</code>.</p>
       </div>
       <div class="metric-panel">
         <p class="metric-panel-title">replica_dtu_used and dtu_used</p>
-        <svg class="metric-chart" viewBox="0 0 640 180" role="img" aria-label="Example chart with replica DTU below primary DTU, both spiking at the same times">
+        <svg class="metric-chart" viewBox="0 0 640 180" role="img" aria-label="Example chart: replica DTU stays below primary DTU, and both spike at the same times">
           <g stroke="#1e293b" stroke-width="1">
             <line x1="48" y1="24" x2="620" y2="24"/>
             <line x1="48" y1="68" x2="620" y2="68"/>
@@ -201,11 +201,11 @@
           <polyline fill="none" stroke="#e879f9" stroke-width="2" points="48,146 120,146 150,28 170,140 230,120 280,100 330,108 380,90 430,70 470,146 520,64 560,146 600,144 620,146"/>
           <polyline fill="none" stroke="#38bdf8" stroke-width="2" points="48,146 120,146 150,108 170,144 230,140 280,132 330,136 380,128 430,120 470,146 520,90 560,146 600,146 620,146"/>
         </svg>
-        <p class="metric-legend"><i class="swatch" style="background:#38bdf8"></i> replica_dtu_used <i class="swatch" style="background:#e879f9"></i> dtu_used <span>Example. The replica series is custom. dtu_used is the platform metric.</span></p>
+        <p class="metric-legend"><i class="swatch" style="background:#38bdf8"></i> replica_dtu_used <i class="swatch" style="background:#e879f9"></i> dtu_used <span>Example data. replica_dtu_used is a custom metric; dtu_used is the platform metric.</span></p>
       </div>
       <div class="config-block">
-        <h3 class="heading-md">Lambdas in the rule</h3>
-        <p class="text-sm text-muted">Transform and ScaleTarget are C# lambdas. This one reads FileCapacity, converts the average to GB, and sets provisioned storage to that plus 50 GB.</p>
+        <h3 class="heading-md">C# lambdas in rules</h3>
+        <p class="text-sm text-muted">Transform and ScaleTarget are C# lambda expressions. This rule reads FileCapacity, converts the average to GB, and sets provisioned storage to that value plus 50 GB.</p>
         <pre class="config-yaml"><code>ScalingConfigurations:
   Baseline:
     Metrics:
@@ -240,43 +240,43 @@
     <div class="container">
       <div class="section-header section-header--sm">
         <p class="eyebrow">Features</p>
-        <h2 class="heading-lg">Smart scaling, zero babysitting</h2>
+        <h2 class="heading-lg">Scaling you don't have to watch</h2>
       </div>
       <div class="grid-2">
         <div class="card card--feature">
           <div class="card-icon card-icon--plain-blue card-icon--sm">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01"/></svg>
           </div>
-          <h3 class="heading-md">Self-Hosted</h3>
-          <p class="text-sm text-muted">Runs as a containerized application in your AKS cluster or Azure Container Services. Your data never leaves your environment.</p>
+          <h3 class="heading-md">Self-hosted</h3>
+          <p class="text-sm text-muted">Runs as a container in your AKS cluster or Azure Container Services. Your data never leaves your environment.</p>
         </div>
         <div class="card card--feature">
           <div class="card-icon card-icon--plain-blue card-icon--sm">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
           </div>
-          <h3 class="heading-md">Schedule-Based Scaling</h3>
-          <p class="text-sm text-muted">Scale up before business hours, scale down overnight. Define schedules that match your real traffic patterns and save money when resources are idle.</p>
+          <h3 class="heading-md">Schedule-based scaling</h3>
+          <p class="text-sm text-muted">Scale up before business hours and down overnight. Set schedules that match your real traffic and stop paying for capacity nobody is using.</p>
         </div>
         <div class="card card--feature">
           <div class="card-icon card-icon--plain-blue card-icon--sm">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
           </div>
-          <h3 class="heading-md">Flexible Metric Analysis</h3>
-          <p class="text-sm text-muted">Write custom scaling rules using Lambda expressions evaluated against real-time Azure Monitor metrics. Total control without code changes.</p>
+          <h3 class="heading-md">Flexible metric rules</h3>
+          <p class="text-sm text-muted">Write scaling rules as C# lambda expressions evaluated against real-time Azure Monitor metrics. You get full control without changing the autoscaler's code.</p>
         </div>
         <div class="card card--feature">
           <div class="card-icon card-icon--plain-blue card-icon--sm">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
           </div>
-          <h3 class="heading-md">Usage Forecasting</h3>
-          <p class="text-sm text-muted">Custom forecasting algorithms predict future demand and scale proactively — before load spikes cause degraded performance.</p>
+          <h3 class="heading-md">Usage forecasting</h3>
+          <p class="text-sm text-muted">Custom forecasting algorithms predict demand and scale ahead of it, before a load spike degrades performance.</p>
         </div>
         <div class="card card--feature span-2">
           <div class="card-icon card-icon--plain-blue card-icon--sm">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
           </div>
-          <h3 class="heading-md">Multidimensional Scaling</h3>
-          <p class="text-sm text-muted">Target multiple dimensions for the same resource — CPU, memory, IOPS, available storage. The system automatically picks the best available SKU or scales each dimension independently when the resource supports it.</p>
+          <h3 class="heading-md">Multidimensional scaling</h3>
+          <p class="text-sm text-muted">Target several dimensions of the same resource, such as CPU, memory, IOPS, and available storage. The autoscaler picks the best available SKU, or scales each dimension independently when the resource allows it.</p>
         </div>
       </div>
     </div>
@@ -285,27 +285,27 @@
   <section id="how-it-works" class="section section--border">
     <div class="container">
       <div class="section-header text-center">
-        <p class="eyebrow">Getting Started</p>
-        <h2 class="heading-lg">Deploy and forget</h2>
-        <p class="text-muted max-w-xl">Deploy the containerized solution, grant permissions, and let it run.</p>
+        <p class="eyebrow">Getting started</p>
+        <h2 class="heading-lg">Three steps to production</h2>
+        <p class="text-muted max-w-xl">Deploy the container, grant it the permissions it needs, and let it run.</p>
       </div>
       <div class="steps">
         <div class="step-card">
           <div class="step-number step-number--blue">1</div>
-          <h3 class="heading-md">Create your configuration</h3>
-          <p class="text-sm text-muted">Define your scaling rules and resources. Monitor the autoscaler in dry-run mode before going live.</p>
+          <h3 class="heading-md">Write your configuration</h3>
+          <p class="text-sm text-muted">Define the resources and their scaling rules. Run the autoscaler in dry-run mode and watch what it would do before going live.</p>
           <div class="step-connector"></div>
         </div>
         <div class="step-card">
           <div class="step-number step-number--violet">2</div>
           <h3 class="heading-md">Turn on autoscaling</h3>
-          <p class="text-sm text-muted">Enable the solution and forget about manually scaling or babysitting your resources ever again.</p>
+          <p class="text-sm text-muted">Enable it. Nobody has to resize those resources by hand anymore.</p>
           <div class="step-connector"></div>
         </div>
         <div class="step-card">
           <div class="step-number step-number--emerald">3</div>
           <h3 class="heading-md">Monitor and optimize</h3>
-          <p class="text-sm text-muted">Watch your resources scale automatically. Track cost savings and performance improvements over time.</p>
+          <p class="text-sm text-muted">Watch your resources scale on their own, and track savings and performance over time.</p>
         </div>
       </div>
     </div>
@@ -317,13 +317,13 @@
         <div>
           <p class="eyebrow">Licensing</p>
           <h2 class="heading-lg mb-6">Get Azure Autoscaler</h2>
-          <p class="text-muted mb-6">Buy and deploy directly from Microsoft Azure Marketplace. You receive access to a private container registry, where you pull container images that are already built, and a license code. Set that code in the environment variables of the deployment.</p>
-          <p class="text-muted mb-6">Or only pay for what you save. We deploy Azure Autoscaler with you. For 12 months the fee is 50% of the Azure spend you save. After that, regular licensing.</p>
+          <p class="text-muted mb-6">Buy it on Microsoft Azure Marketplace and deploy it in your subscription. You get a license code and access to a private container registry with prebuilt images. Set the license code as an environment variable in your deployment.</p>
+          <p class="text-muted mb-6">Or pay only for what you save. We deploy Azure Autoscaler with you, and for the first 12 months our fee is 50% of the Azure spend you save. After that, standard licensing applies.</p>
         </div>
         <div class="purchase-options">
           <div class="card purchase-box">
             <p class="purchase-label">Azure Marketplace</p>
-            <p class="text-sm text-muted mb-6 text-center">Buy and deploy directly from your Azure subscription, billed through Azure. Ideal for enterprise procurement and MACC.</p>
+            <p class="text-sm text-muted mb-6 text-center">Buy and deploy from your Azure subscription, billed through Azure. A good fit for enterprise procurement and MACC.</p>
             <a href="https://marketplace.microsoft.com/en-us/product/mutex-studio-sl.resourceautoscaler?tab=Overview" class="btn btn-primary btn-primary--full" target="_blank" rel="noopener">Get it on Azure Marketplace</a>
             <p class="text-xs text-muted mt-6 text-center">Mutex Studio S.L. · Microsoft partner</p>
           </div>

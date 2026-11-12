@@ -4,7 +4,7 @@
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Storage Observer — Find which folder holds the bytes. Scan local disks, shares, SharePoint, S3, and Azure storage, then see path, cost, and growth. Self-hosted.">
+  <meta name="description" content="Storage Observer finds the folders that hold your data. Scan local disks, network shares, SharePoint, S3, and Azure storage, then see each path's size, cost, and growth. Self-hosted.">
   <title>Storage Observer — Mutex Studio</title>
 
   <link rel="icon" href="/assets/img/favicons/icon.svg?v=5" type="image/svg+xml">
@@ -95,7 +95,7 @@
           Storage <span class="gradient-text">Observer</span>
         </h1>
         <p class="lead">
-          Capacity is one number. The folder that holds it is not. Scan local disks, network shares, SharePoint, S3, Azure Files, and Blob, <strong>then see which path is using the space, what it costs, and how that folder grew.</strong>
+          Capacity is a single number. It doesn't tell you which folder is using it. Scan local disks, network shares, SharePoint, S3, Azure Files, and Blob storage, <strong>then see which path is using the space, what it costs, and how that folder grew.</strong>
         </p>
         <div class="badge badge--violet mb-6">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01"/></svg>
@@ -110,8 +110,8 @@
     <div class="container">
       <div class="section-header">
         <p class="eyebrow">How it works</p>
-        <h2 class="heading-lg">Daemons where the files are.<br>One screen for the storage.</h2>
-        <p class="text-muted max-w-3xl">Deploy a daemon next to each source. It reads local disks, network shares, SharePoint, AWS, and Azure storage, then reports usage to a central server. The GUI shows how much each source consumes.</p>
+        <h2 class="heading-lg">A daemon next to each source.<br>One screen for all your storage.</h2>
+        <p class="text-muted max-w-3xl">Each daemon runs next to the storage it scans: local disks, network shares, SharePoint, AWS, or Azure. It reports usage to a central server, and the UI shows how much each source uses.</p>
       </div>
       <div class="arch">
         <div class="arch-sources">
@@ -185,7 +185,7 @@
       <div class="section-header">
         <p class="eyebrow">Roots</p>
         <h2 class="heading-lg">Files, capacity, and cost.</h2>
-        <p class="text-muted">What each root is using, and what that storage costs each month.</p>
+        <p class="text-muted">How much each scan root uses, and what that storage costs per month.</p>
       </div>
       <div class="so-frame">
         <div class="so-topbar">
@@ -288,7 +288,7 @@
       <div class="section-header">
         <p class="eyebrow">Navigation</p>
         <h2 class="heading-lg">Direct children, or the whole subtree.</h2>
-        <p class="text-muted">A folder can report 300 GB and hold 12 files. The rest is underneath. Each row splits what sits in this directory — direct files and direct folders — from the totals for the tree below it, including empty folders. Sort by direct children when the size is only being passed through.</p>
+        <p class="text-muted">A folder can report 300 GB and hold only 12 files; the rest is further down. Each row separates what sits directly in the folder (direct files and direct folders) from the totals for the whole tree below it, including empty folders. Sort by direct children to skip past folders that only pass the size through.</p>
       </div>
       <div class="so-frame">
         <div class="so-topbar">
@@ -520,7 +520,7 @@
       <div class="section-header">
         <p class="eyebrow">Speed</p>
         <h2 class="heading-lg">1,500 directory entries/s on remote SMB.</h2>
-        <p class="text-muted">Measured while enumerating an Azure Files share over SMB. Each entry is a file or directory returned by the listing call. SMB metadata latency makes that share a slow source. A local disk or another protocol lists at a different rate.</p>
+        <p class="text-muted">Measured while listing an Azure Files share over SMB, where each entry is one file or directory returned by the listing call. SMB metadata latency makes this a slow source; local disks and other protocols list at different rates.</p>
       </div>
       <div class="so-frame">
         <div class="so-topbar">
@@ -601,8 +601,8 @@
     <div class="container">
       <div class="section-header">
         <p class="eyebrow">Capabilities</p>
-        <h2 class="heading-lg">See everything.<br>Miss nothing.</h2>
-        <p class="text-muted">Storage Observer gives you a unified, real-time view of your file and storage landscape across any number of sources — without moving your data anywhere.</p>
+        <h2 class="heading-lg">All your storage.<br>One place to look.</h2>
+        <p class="text-muted">Storage Observer brings files and storage from any number of sources into one real-time view, without moving your data.</p>
       </div>
 
       <div class="grid-4 mb-6">
@@ -610,29 +610,29 @@
           <div class="card-icon card-icon--violet">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
           </div>
-          <h3 class="heading-md">Multi-Source Support</h3>
-          <p class="text-sm text-muted">Local filesystems, NFS and SMB shares, SharePoint, Amazon S3, Azure Files, Azure Blob, and ADLS — all in a single view.</p>
+          <h3 class="heading-md">Many sources, one view</h3>
+          <p class="text-sm text-muted">Local filesystems, NFS and SMB shares, SharePoint, Amazon S3, Azure Files, Azure Blob, and ADLS, all side by side.</p>
         </div>
         <div class="card card--feature-lg">
           <div class="card-icon card-icon--violet">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           </div>
-          <h3 class="heading-md">Billions of Files</h3>
-          <p class="text-sm text-muted">Engineered from the ground up for massive scale. Whether you have millions or billions of files, Storage Observer maintains consistent performance.</p>
+          <h3 class="heading-md">Billions of files</h3>
+          <p class="text-sm text-muted">Designed for very large file counts. Performance stays consistent whether a source holds millions of files or billions.</p>
         </div>
         <div class="card card--feature-lg">
           <div class="card-icon card-icon--violet">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
           </div>
-          <h3 class="heading-md">Fully Self-Hosted</h3>
-          <p class="text-sm text-muted">No SaaS account, no cloud vendor dependency, no telemetry. Deploy in your own infrastructure and keep full control of your data.</p>
+          <h3 class="heading-md">Fully self-hosted</h3>
+          <p class="text-sm text-muted">No SaaS account, no dependency on a cloud vendor, no telemetry. Deploy it on your own infrastructure and keep full control of your data.</p>
         </div>
         <div class="card card--feature-lg">
           <div class="card-icon card-icon--violet">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
           </div>
-          <h3 class="heading-md">Optimization</h3>
-          <p class="text-sm text-muted">Optimized data refreshing based on historical usage patterns to reduce IOPS-heavy storage usage.</p>
+          <h3 class="heading-md">Lighter on IOPS</h3>
+          <p class="text-sm text-muted">Refreshes are tuned to historical usage patterns, which cuts the IOPS spent rescanning storage.</p>
         </div>
       </div>
 
@@ -641,19 +641,19 @@
         <div class="grid-2 mt-6">
           <div class="feature-row">
             <span class="check-icon check-icon--violet"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
-            <p class="text-sm text-muted">Gain cost visibility into storage spend across all your accounts and providers</p>
+            <p class="text-sm text-muted">See what storage costs across all your accounts and providers</p>
           </div>
           <div class="feature-row">
             <span class="check-icon check-icon--violet"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
-            <p class="text-sm text-muted">Detect orphan files and reclaim wasted storage capacity automatically</p>
+            <p class="text-sm text-muted">Detect orphaned files and reclaim wasted capacity automatically</p>
           </div>
           <div class="feature-row">
             <span class="check-icon check-icon--violet"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
-            <p class="text-sm text-muted">Compliance and audit trails — know what files exist, where, and since when</p>
+            <p class="text-sm text-muted">Keep an audit trail for compliance: which files exist, where, and since when</p>
           </div>
           <div class="feature-row">
             <span class="check-icon check-icon--violet"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>
-            <p class="text-sm text-muted">Monitor storage growth trends and forecast when capacity limits will be hit</p>
+            <p class="text-sm text-muted">Track storage growth and forecast when you will hit capacity limits</p>
           </div>
         </div>
       </div>
@@ -666,12 +666,12 @@
         <div>
           <p class="eyebrow">Licensing</p>
           <h2 class="heading-lg mb-6">Get Storage Observer</h2>
-          <p class="text-muted mb-6">Subscribe through Azure Marketplace. You receive access to a private container registry, where you pull container images that are already built, and a license code. Set that code in the environment variables of the deployment.</p>
+          <p class="text-muted mb-6">Subscribe through Azure Marketplace. You get a license code and access to a private container registry with prebuilt images. Set the license code as an environment variable in your deployment.</p>
         </div>
         <div class="purchase-options">
           <div class="card purchase-box">
             <p class="purchase-label">Azure Marketplace</p>
-            <p class="text-sm text-muted mb-6 text-center">Subscribe through Azure Marketplace — billed on your Azure subscription. Ideal for enterprise procurement and MACC.</p>
+            <p class="text-sm text-muted mb-6 text-center">Subscribe through Azure Marketplace, billed on your Azure subscription. A good fit for enterprise procurement and MACC.</p>
             <a href="#" class="btn btn-secondary btn-primary--full">View on Azure Marketplace</a>
             <p class="text-xs text-muted mt-6 text-center">Mutex Studio S.L. · Microsoft partner</p>
           </div>
