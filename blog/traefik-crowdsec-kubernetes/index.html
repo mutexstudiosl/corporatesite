@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="How to run CrowdSec with Traefik on Kubernetes: Helm install, Traefik access log parsing, the bouncer plugin as a Middleware, AppSec and real client IPs on AKS.">
+  <title>Traefik CrowdSec on Kubernetes: bouncer plugin and AppSec — Mutex Studio</title>
+
+  <link rel="icon" href="/assets/img/favicons/icon.svg?v=5" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png?v=5">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png?v=5">
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/img/favicons/favicon.ico?v=5">
+  <link rel="manifest" href="/assets/img/favicons/site.webmanifest">
+  <link rel="stylesheet" href="/assets/css/site.css?v=20">
+  <link rel="canonical" href="https://www.mutexstudio.com/blog/traefik-crowdsec-kubernetes/">
+  <link rel="alternate" type="application/rss+xml" title="Mutex Studio blog" href="https://www.mutexstudio.com/blog/feed.xml">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Mutex Studio">
+  <meta property="og:title" content="Traefik CrowdSec on Kubernetes: bouncer plugin and AppSec — Mutex Studio">
+  <meta property="og:description" content="How to run CrowdSec with Traefik on Kubernetes: Helm install, Traefik access log parsing, the bouncer plugin as a Middleware, AppSec and real client IPs on AKS.">
+  <meta property="og:url" content="https://www.mutexstudio.com/blog/traefik-crowdsec-kubernetes/">
+  <meta property="og:image" content="https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta property="article:published_time" content="2026-11-17">
+  <meta property="article:modified_time" content="2026-11-17">
+  <meta property="article:author" content="David García García">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Traefik CrowdSec on Kubernetes: bouncer plugin and AppSec",
+  "description": "How to run CrowdSec with Traefik on Kubernetes: Helm install, Traefik access log parsing, the bouncer plugin as a Middleware, AppSec and real client IPs on AKS.",
+  "datePublished": "2026-11-17",
+  "dateModified": "2026-11-17",
+  "inLanguage": "en",
+  "wordCount": 1900,
+  "url": "https://www.mutexstudio.com/blog/traefik-crowdsec-kubernetes/",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.mutexstudio.com/blog/traefik-crowdsec-kubernetes/"
+  },
+  "image": "https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png",
+  "author": {
+    "@type": "Person",
+    "name": "David García García",
+    "url": "https://medium.com/@deividb"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Mutex Studio",
+    "url": "https://www.mutexstudio.com/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png"
+    }
+  }
+}
+  </script>
+</head>
+
+<body class="accent-emerald page-blog">
+
+  <nav class="site-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+    </a>
+
+    <div class="nav-desktop">
+      <div class="nav-group">
+        <button type="button" class="nav-trigger" aria-haspopup="true">
+          Products
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="/azure-autoscaler/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--blue">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Azure Autoscaler</div>
+              <div class="nav-dropdown-desc">Smart resource scaling</div>
+            </div>
+          </a>
+          <a href="/storage-observer/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--violet">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Storage Observer</div>
+              <div class="nav-dropdown-desc">File storage at any scale</div>
+            </div>
+          </a>
+          <a href="/traefik-precompiled/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--emerald">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Traefork</div>
+              <div class="nav-dropdown-desc">Soft-fork, plugins compiled in</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <a href="/consulting/" class="nav-link nav-link-consulting">Consulting</a>
+      <a href="/support/" class="nav-link nav-link-support">Support</a>
+      <a href="/blog/" class="nav-link nav-link-blog">Blog</a>
+    </div>
+
+    <a href="/consulting/#contact" class="nav-cta">Talk to us</a>
+
+    <button type="button" id="mobile-menu-btn" class="nav-mobile-btn" aria-label="Open menu">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="nav-mobile">
+    <p class="nav-mobile-label">Products</p>
+    <a href="/azure-autoscaler/" class="nav-mobile-link">Azure Autoscaler</a>
+    <a href="/storage-observer/" class="nav-mobile-link">Storage Observer</a>
+    <a href="/traefik-precompiled/" class="nav-mobile-link">Traefork</a>
+    <div class="nav-mobile-divider"></div>
+    <a href="/consulting/" class="nav-mobile-link">Consulting</a>
+    <a href="/support/" class="nav-mobile-link">Support</a>
+    <a href="/blog/" class="nav-mobile-link">Blog</a>
+    <a href="/consulting/#contact" class="nav-mobile-cta">Talk to us</a>
+  </div>
+</nav>
+
+  <main class="post">
+    <article class="post-inner">
+      <a href="/blog/" class="hero-back">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        All posts
+      </a>
+      <header class="post-header">
+        <p class="eyebrow">Kubernetes security</p>
+        <h1>Traefik CrowdSec on Kubernetes: bouncer plugin and AppSec</h1>
+        <p class="post-lead">CrowdSec reads Traefik&#x27;s access logs, decides which IPs to block, and a bouncer middleware in Traefik enforces those decisions. This is how we set it up on Kubernetes, including AppSec and the client IP details that matter on AKS.</p>
+        <p class="post-meta"><span>By David García García</span><span><time datetime="2026-11-17">17 November 2026</time></span><span>9 min read</span></p>
+      </header>
+
+      <div class="prose">
+<p>A Traefik CrowdSec setup has two halves. CrowdSec watches what reaches your cluster and decides which IP addresses to block, and Traefik enforces those decisions on each request through a middleware. On Kubernetes both halves are installed with Helm, and the parts that need care are the log acquisition, the bouncer key and the client IP. This post walks through all of it, using the official CrowdSec Helm chart and the community bouncer plugin for Traefik. If you are coming from ingress-nginx, our post on <a href="/blog/ingress-nginx-retirement-aks/">the ingress-nginx retirement on AKS</a> covers the move to Traefik itself; here we assume Traefik is already your ingress.</p>
+
+<h2>The components and how they talk to each other</h2>
+
+<p>The <a href="https://docs.crowdsec.net/docs/next/intro">CrowdSec documentation</a> splits the system into a few parts. The Security Engine is the open source core. Its log processor (the agent) reads logs from configured sources, parses them and runs scenarios, which are behaviour patterns such as scanning for missing paths or brute forcing a login. When a scenario triggers, the result is sent to the Local API (LAPI), which stores decisions and acts as the middleman between the log processors, the remediation components and CrowdSec's Central API. The Central API receives the alerts you share and sends back a community blocklist.</p>
+
+<p>Remediation components, still often called bouncers, are what actually block traffic. They ask the LAPI whether an IP has a decision against it and react accordingly. For Traefik, the usual bouncer is the <a href="https://github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin">crowdsec-bouncer-traefik-plugin</a>, a community plugin listed in the <a href="https://plugins.traefik.io/plugins/6335346ca4caa9ddeffda116/crowdsec-bouncer-traefik-plugin">Traefik plugin catalog</a>.</p>
+
+<p>The third part is the <a href="https://docs.crowdsec.net/docs/next/appsec/intro">AppSec component</a>, CrowdSec's web application firewall. Instead of acting on logs after the fact, the bouncer forwards each HTTP request to AppSec, which evaluates it against rules (virtual patching for known vulnerabilities, generic rules, and legacy ModSecurity rules) and tells the bouncer to block or allow it. Traefik is one of the supported integrations.</p>
+
+<p>On Kubernetes this gives you an agent on each node reading container logs, a LAPI deployment, an optional AppSec deployment, and Traefik pods running the plugin as a middleware that talks to the LAPI and AppSec services over the cluster network.</p>
+
+<h2>Installing CrowdSec with Helm on Kubernetes</h2>
+
+<p>The bouncer and the LAPI share a key. Generate it once and store it in two Secrets, one in each namespace, so it never appears in a values file or a Middleware manifest. This is the approach the plugin's <a href="https://github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin/blob/main/examples/kubernetes/README.md">Kubernetes example</a> uses:</p>
+
+<pre><code>kubectl create namespace crowdsec
+kubectl create namespace traefik
+BOUNCER_KEY=$(openssl rand -hex 32)
+kubectl -n crowdsec create secret generic crowdsec-keys \
+  --from-literal=BOUNCER_KEY_traefik="$BOUNCER_KEY"
+kubectl -n traefik create secret generic crowdsec-bouncer-key \
+  --from-literal=BOUNCER_KEY_traefik="$BOUNCER_KEY"</code></pre>
+
+<p>The chart lives in the <a href="https://github.com/crowdsecurity/helm-charts">crowdsecurity/helm-charts</a> repository and deploys the Security Engine and the LAPI. The values below follow the <a href="https://docs.crowdsec.net/u/getting_started/installation/kubernetes">Kubernetes installation guide</a> and the <a href="https://docs.crowdsec.net/docs/appsec/quickstart/traefik/">AppSec quickstart for Traefik</a>:</p>
+
+<pre><code># crowdsec-values.yaml
+container_runtime: containerd
+
+agent:
+  acquisition:
+    - namespace: traefik
+      podName: traefik-*
+      program: traefik
+  env:
+    - name: COLLECTIONS
+      value: "crowdsecurity/traefik"
+
+lapi:
+  env:
+    - name: BOUNCER_KEY_traefik
+      valueFrom:
+        secretKeyRef:
+          name: crowdsec-keys
+          key: BOUNCER_KEY_traefik
+
+appsec:
+  enabled: true
+  acquisitions:
+    - source: appsec
+      listen_addr: "0.0.0.0:7422"
+      path: /
+      appsec_configs:
+        - crowdsecurity/appsec-default
+      labels:
+        type: appsec
+  env:
+    - name: COLLECTIONS
+      value: "crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-generic-rules"</code></pre>
+
+<pre><code>helm repo add crowdsec https://crowdsecurity.github.io/helm-charts
+helm repo update
+helm upgrade --install crowdsec crowdsec/crowdsec \
+  --namespace crowdsec --values crowdsec-values.yaml
+kubectl -n crowdsec wait --for=condition=Available deployment --all --timeout=5m</code></pre>
+
+<p><code>container_runtime</code> tells the agent how the container log lines are wrapped. The installation guide's comment lists <code>json</code> or <code>cri</code> (docker or containerd). If it does not match your nodes, the agent cannot parse Traefik's lines. <code>kubectl get nodes -o wide</code> shows the runtime in the <code>CONTAINER-RUNTIME</code> column.</p>
+
+<p>The <code>agent.acquisition</code> entry selects the pods whose logs CrowdSec reads, by namespace and pod name pattern, and <code>program: traefik</code> routes those lines to the Traefik parser. If your Traefik release has a different name or namespace, change both fields, or the agent will run without reading anything.</p>
+
+<p><code>BOUNCER_KEY_traefik</code> in the LAPI environment registers a bouncer with the key from the Secret, so you do not have to run <code>cscli bouncers add</code> by hand. The plugin example also sets <code>DISABLE_ONLINE_API</code> to keep a test setup from sharing signals with CrowdSec; leave that out in production if you want the community blocklist.</p>
+
+<p>For anything beyond a test, pin the chart with <code>--version</code> and upgrade deliberately. The plugin's example warns against overriding <code>image.tag</code>, because each chart version ships the image it was tested with.</p>
+
+<h2>Traefik access logs and what CrowdSec parses</h2>
+
+<p>The <code>crowdsecurity/traefik</code> collection installs the <code>crowdsecurity/traefik-logs</code> parser and the <code>crowdsecurity/base-http-scenarios</code> collection, which holds the generic HTTP scenarios such as crawling, 404 scanning and brute force. According to the <a href="https://app.crowdsec.net/hub/author/crowdsecurity/collections/traefik">hub page</a>, the parser supports both CLF and JSON access logs.</p>
+
+<p>Traefik's <a href="https://doc.traefik.io/traefik/reference/install-configuration/observability/logs-and-accesslogs/">access log</a> is off by default in the Helm chart. When enabled, it writes to standard output in the <code>common</code> format unless you set <code>format: json</code>. We use JSON. Logged headers are controlled by <code>fields.headers.defaultMode</code>, which defaults to <code>drop</code>. Keep it that way and allow only <code>User-Agent</code>, which the scenarios use, so cookies and <code>Authorization</code> headers never reach your logs.</p>
+
+<p>The <a href="https://raw.githubusercontent.com/crowdsecurity/hub/master/parsers/s01-parse/crowdsecurity/traefik-logs.yaml">parser source</a> shows which fields it reads from a JSON line: the source IP comes from <code>ClientHost</code> and the user agent from <code>request_User-Agent</code>. <code>ClientHost</code> is the remote IP of the request, so it is only useful if the connection Traefik sees really comes from the client. We come back to that below.</p>
+
+<h2>The Traefik CrowdSec bouncer plugin as a Middleware</h2>
+
+<p>Plugins are declared in Traefik's install (static) configuration and then used from dynamic configuration, as described in Traefik's <a href="https://doc.traefik.io/traefik/extend/extend-traefik/">plugin documentation</a>. With the official <a href="https://raw.githubusercontent.com/traefik/traefik-helm-chart/master/traefik/values.yaml">Traefik Helm chart</a>, these values load the plugin, mount the bouncer key, enable JSON access logs and keep the client IP:</p>
+
+<pre><code># traefik-values.yaml
+experimental:
+  plugins:
+    bouncer:
+      moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      version: "v1.8.2"
+
+volumes:
+  - name: crowdsec-bouncer-key
+    mountPath: /etc/traefik/crowdsec
+    type: secret
+
+accessLog:
+  enabled: true
+  format: json
+  fields:
+    headers:
+      defaultMode: drop
+      names:
+        User-Agent: keep
+
+service:
+  spec:
+    externalTrafficPolicy: Local</code></pre>
+
+<p>v1.8.2 is the current release in the plugin catalog as we write this. The key under <code>experimental.plugins</code> (here <code>bouncer</code>) is the name you use in the Middleware.</p>
+
+<p>The Traefik CrowdSec middleware itself is a <code>Middleware</code> custom resource with a <code>spec.plugin.bouncer</code> block. This one is close to the example in the plugin repository:</p>
+
+<pre><code>apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: bouncer
+  namespace: traefik
+spec:
+  plugin:
+    bouncer:
+      enabled: true
+      logLevel: INFO
+      crowdsecMode: stream
+      crowdsecLapiScheme: http
+      crowdsecLapiHost: crowdsec-service.crowdsec.svc.cluster.local:8080
+      crowdsecLapiKeyFile: /etc/traefik/crowdsec/BOUNCER_KEY_traefik
+      crowdsecAppsecEnabled: true
+      crowdsecAppsecHost: crowdsec-appsec-service.crowdsec.svc.cluster.local:7422</code></pre>
+
+<p>The plugin <a href="https://github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin">README</a> documents the options. The ones you are most likely to change are these:</p>
+
+<ul>
+  <li><code>crowdsecMode</code>: <code>live</code> (the default) asks the LAPI about each new IP and caches the answer, whether it is a ban or not, for <code>defaultDecisionSeconds</code> (60 by default). <code>stream</code> keeps a local list of banned IPs and refreshes it every <code>updateIntervalSeconds</code> (also 60 by default). <code>none</code> asks the LAPI on every request without caching. <code>alone</code> uses the CrowdSec Central API blocklist directly, without a local LAPI. <code>appsec</code> skips the IP check and only runs AppSec.</li>
+  <li><code>crowdsecLapiKeyFile</code>: the README lets you append <code>File</code> to secret options and pass a path instead of the value. If both are set, the file wins.</li>
+  <li><code>clientTrustedIPs</code>: addresses that bypass the bouncer and its cache completely, for example a VPN range.</li>
+  <li><code>updateMaxFailure</code>: what happens when the LAPI cannot be reached. With the default <code>0</code>, traffic is blocked on the first failure; <code>-1</code> never blocks for that reason. In <code>live</code> and <code>none</code> modes only <code>-1</code> changes the behaviour.</li>
+  <li><code>crowdsecAppsecUnreachableBlock</code> and <code>crowdsecAppsecFailureBlock</code>: both default to <code>true</code>, so if the AppSec service is down or returns something unexpected, requests are blocked.</li>
+</ul>
+
+<p>Those last two defaults fail closed. That is a reasonable choice for a WAF, but it means the CrowdSec pods are now on the request path. Give the LAPI and AppSec deployments the same attention you give Traefik, or decide explicitly to fail open. The README also notes that some settings, including the cache, are shared by all CrowdSec middlewares in a Traefik instance, so a ban applies on every router that uses the plugin.</p>
+
+<p>Attach the middleware to a standard Ingress with an annotation in <code>&lt;namespace&gt;-&lt;name&gt;@kubernetescrd</code> form:</p>
+
+<pre><code>metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-bouncer@kubernetescrd</code></pre>
+
+<p>If you enable <code>safeNaming</code> in the <a href="https://doc.traefik.io/traefik/reference/install-configuration/providers/kubernetes/kubernetes-crd/">Kubernetes CRD provider</a>, the separator becomes an underscore (<code>traefik_bouncer@kubernetescrd</code>). On an IngressRoute, list it under the route's <code>middlewares</code> with <code>name</code> and <code>namespace</code>. Referencing a middleware in another namespace from an IngressRoute requires <code>allowCrossNamespace</code>, which is <code>false</code> by default; the alternative is a copy of the Middleware in each application namespace.</p>
+
+<h2>Getting the real client IP behind the Azure load balancer</h2>
+
+<p>Both halves depend on the client IP. The agent bans whatever address appears in <code>ClientHost</code>, and the bouncer checks the address it extracts from the request. If every request seems to come from a node, scenarios will at some point ban a node address and everyone behind it.</p>
+
+<p>On AKS, Microsoft's <a href="https://learn.microsoft.com/en-us/azure/aks/configure-load-balancer-standard">load balancer documentation</a> states that a <code>LoadBalancer</code> Service does not keep the client's IP by default: the source address delivered to the pod becomes the node's private IP. To keep it, set <code>externalTrafficPolicy: Local</code> on the Traefik Service, as in the values above. The Kubernetes documentation on <a href="https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/">external load balancers</a> explains the trade-off: traffic only goes to nodes that run a Traefik pod, and the load balancer does not know how many pods each node has, so spreading can be uneven.</p>
+
+<p>With the load balancer directly in front of Traefik, the remote address is the client and the bouncer's defaults work. The plugin reads <code>X-Forwarded-For</code>, and its README notes that this is safe because Traefik's entrypoints strip forwarded headers from untrusted peers.</p>
+
+<p>If there is another proxy in front (a CDN, a WAF or another load balancer that terminates HTTP), tell Traefik and the plugin which addresses to trust. On the Traefik side, that is <code>forwardedHeaders.trustedIPs</code> on the <a href="https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/">entrypoint</a>, which the Helm chart exposes per port:</p>
+
+<pre><code>ports:
+  websecure:
+    forwardedHeaders:
+      trustedIPs:
+        - "&lt;proxy-cidr-1&gt;"
+        - "&lt;proxy-cidr-2&gt;"</code></pre>
+
+<p>On the plugin side, set <code>forwardedHeadersTrustedIPs</code> to the same ranges. The README says that once it is set, the header is only read from peers in that list, and every proxy that connects directly to Traefik must be included. If your proxy puts the client address in a header other than <code>X-Forwarded-For</code>, name it with <code>forwardedHeadersCustomName</code>. Avoid <code>forwardedHeaders.insecure</code>; Traefik's reference says it is for tests only. After any change, look at a few access log lines and confirm that <code>ClientHost</code> shows public client addresses.</p>
+
+<h2>Testing with a manual decision</h2>
+
+<p>Check that the bouncer registered and that the agent is reading Traefik's logs:</p>
+
+<pre><code>kubectl -n crowdsec exec deployment/crowdsec-lapi -- cscli bouncers list
+kubectl -n crowdsec exec daemonset/crowdsec-agent -- cscli metrics show acquisition parsers</code></pre>
+
+<p>Then ban your own public IP for a few minutes and request a route that uses the middleware. <code>cscli decisions add</code> creates a <code>ban</code> by default, and the <a href="https://docs.crowdsec.net/docs/next/cscli/cscli_decisions_add">reference</a> lists the default duration as four hours, so pass a short one:</p>
+
+<pre><code>kubectl -n crowdsec exec deployment/crowdsec-lapi -- \
+  cscli decisions add --ip "$MY_PUBLIC_IP" --duration 5m --reason "bouncer test"
+curl -i https://app.example.com/</code></pre>
+
+<p>The plugin answers with <code>remediationStatusCode</code>, 403 by default. In <code>stream</code> mode the ban appears after the next refresh, so allow up to <code>updateIntervalSeconds</code>; in <code>live</code> mode a cached answer for your IP can last up to <code>defaultDecisionSeconds</code>. Remove the decision with <a href="https://docs.crowdsec.net/docs/next/cscli/cscli_decisions_delete">cscli decisions delete</a>:</p>
+
+<pre><code>kubectl -n crowdsec exec deployment/crowdsec-lapi -- \
+  cscli decisions delete --ip "$MY_PUBLIC_IP"</code></pre>
+
+<p>To test AppSec, request a path that the virtual patching rules block, such as <code>curl -i https://app.example.com/.env</code>, which should also return 403. Running <code>cscli metrics show appsec</code> inside the AppSec pod shows processed and blocked requests per rule. If you test through <code>kubectl port-forward</code> instead of the load balancer, requests appear to come from <code>127.0.0.1</code>, so that is the address to ban.</p>
+
+<h2>Interpreted plugin or compiled in</h2>
+
+<p>Traefik runs community plugins like this one in Yaegi, an embedded Go interpreter, so the bouncer's code is interpreted on every request that passes through the middleware. A <a href="https://github.com/traefik/traefik/issues/12213">Traefik issue we opened</a> describes the higher memory and CPU use we saw with interpreted middleware, and how compiling the same code into the binary removed it; the Traefik team declined to add that build workflow to its roadmap. Our <a href="/traefik-precompiled/">Traefork</a> is a soft-fork that tracks upstream Traefik and compiles ModSecurity, Geoblock, RealIP, CrowdSec and Sablier into the binary. It is not affiliated with Traefik Labs.</p>
+
+<h2>Where to start</h2>
+
+<p>Start on a test cluster or a staging namespace with <code>crowdsecMode: stream</code>, AppSec enabled, and the middleware attached to one low-risk route. Confirm that <code>ClientHost</code> shows real client addresses and that the manual ban returns 403, then watch <code>cscli decisions list</code> and the AppSec metrics for a few days before attaching the middleware to everything. Decide on the fail-open or fail-closed settings before you go to production, since that choice decides what an outage of the CrowdSec pods looks like to your users.</p>
+      </div>
+
+      <aside class="card post-cta" aria-label="Traefork">
+        <p class="eyebrow">Traefork</p>
+        <h2>Where Traefork fits</h2>
+        <p>Traefork is a soft-fork of Traefik that tracks upstream releases and compiles the CrowdSec bouncer plugin (along with ModSecurity, Geoblock, RealIP and Sablier) into the binary, so Yaegi does not run it. The Middleware configuration in this post stays the same.</p>
+        <a href="/traefik-precompiled/" class="btn btn-primary">
+          See Traefork
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+      </aside>
+
+      <p class="post-footer-nav"><a href="/blog/">← Back to all posts</a></p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" class="footer-logo-link">
+        <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+      </a>
+      <p class="footer-tagline">Infrastructure tooling that fills the gaps. Self-hosted, production-grade.</p>
+    </div>
+    <div class="footer-columns">
+      <div>
+        <p class="footer-heading">Products</p>
+        <ul class="footer-links">
+          <li><a href="/azure-autoscaler/">Azure Autoscaler</a></li>
+          <li><a href="/storage-observer/">Storage Observer</a></li>
+          <li><a href="/traefik-precompiled/">Traefork</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-heading">Company</p>
+        <ul class="footer-links">
+          <li><a href="/consulting/">Consulting</a></li>
+          <li><a href="/support/">Support</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/consulting/#contact">Contact</a></li>
+          <li><a href="/traefik-precompiled/#licenses">Open Source Licenses</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Mutex Studio S.L. All rights reserved.</p>
+    <nav class="footer-legal" aria-label="Legal">
+      <a href="/aviso-legal/">Aviso legal</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/cookies/">Cookies</a>
+      <a href="#" data-cookie-settings>Cookie settings</a>
+    </nav>
+    <p>MUTEX STUDIO S.L. · NIF B05790308 · <a href="mailto:info@mutexstudio.com">info@mutexstudio.com</a></p>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js?v=4"></script>
+</body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="What happens inside an Azure SQL Database scale operation, how long it takes, which errors your code should retry, and how to scale and monitor it safely.">
+  <title>Azure SQL scaling downtime: what happens and how to retry — Mutex Studio</title>
+
+  <link rel="icon" href="/assets/img/favicons/icon.svg?v=5" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png?v=5">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png?v=5">
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/img/favicons/favicon.ico?v=5">
+  <link rel="manifest" href="/assets/img/favicons/site.webmanifest">
+  <link rel="stylesheet" href="/assets/css/site.css?v=20">
+  <link rel="canonical" href="https://www.mutexstudio.com/blog/azure-sql-scaling-downtime/">
+  <link rel="alternate" type="application/rss+xml" title="Mutex Studio blog" href="https://www.mutexstudio.com/blog/feed.xml">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Mutex Studio">
+  <meta property="og:title" content="Azure SQL scaling downtime: what happens and how to retry — Mutex Studio">
+  <meta property="og:description" content="What happens inside an Azure SQL Database scale operation, how long it takes, which errors your code should retry, and how to scale and monitor it safely.">
+  <meta property="og:url" content="https://www.mutexstudio.com/blog/azure-sql-scaling-downtime/">
+  <meta property="og:image" content="https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta property="article:published_time" content="2026-11-17">
+  <meta property="article:modified_time" content="2026-11-17">
+  <meta property="article:author" content="David García García">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Azure SQL scaling downtime: what happens and how to retry",
+  "description": "What happens inside an Azure SQL Database scale operation, how long it takes, which errors your code should retry, and how to scale and monitor it safely.",
+  "datePublished": "2026-11-17",
+  "dateModified": "2026-11-17",
+  "inLanguage": "en",
+  "wordCount": 1899,
+  "url": "https://www.mutexstudio.com/blog/azure-sql-scaling-downtime/",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.mutexstudio.com/blog/azure-sql-scaling-downtime/"
+  },
+  "image": "https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png",
+  "author": {
+    "@type": "Person",
+    "name": "David García García",
+    "url": "https://medium.com/@deividb"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Mutex Studio",
+    "url": "https://www.mutexstudio.com/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png"
+    }
+  }
+}
+  </script>
+</head>
+
+<body class="accent-blue page-blog">
+
+  <nav class="site-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+    </a>
+
+    <div class="nav-desktop">
+      <div class="nav-group">
+        <button type="button" class="nav-trigger" aria-haspopup="true">
+          Products
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="/azure-autoscaler/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--blue">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Azure Autoscaler</div>
+              <div class="nav-dropdown-desc">Smart resource scaling</div>
+            </div>
+          </a>
+          <a href="/storage-observer/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--violet">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Storage Observer</div>
+              <div class="nav-dropdown-desc">File storage at any scale</div>
+            </div>
+          </a>
+          <a href="/traefik-precompiled/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--emerald">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Traefork</div>
+              <div class="nav-dropdown-desc">Soft-fork, plugins compiled in</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <a href="/consulting/" class="nav-link nav-link-consulting">Consulting</a>
+      <a href="/support/" class="nav-link nav-link-support">Support</a>
+      <a href="/blog/" class="nav-link nav-link-blog">Blog</a>
+    </div>
+
+    <a href="/consulting/#contact" class="nav-cta">Talk to us</a>
+
+    <button type="button" id="mobile-menu-btn" class="nav-mobile-btn" aria-label="Open menu">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="nav-mobile">
+    <p class="nav-mobile-label">Products</p>
+    <a href="/azure-autoscaler/" class="nav-mobile-link">Azure Autoscaler</a>
+    <a href="/storage-observer/" class="nav-mobile-link">Storage Observer</a>
+    <a href="/traefik-precompiled/" class="nav-mobile-link">Traefork</a>
+    <div class="nav-mobile-divider"></div>
+    <a href="/consulting/" class="nav-mobile-link">Consulting</a>
+    <a href="/support/" class="nav-mobile-link">Support</a>
+    <a href="/blog/" class="nav-mobile-link">Blog</a>
+    <a href="/consulting/#contact" class="nav-mobile-cta">Talk to us</a>
+  </div>
+</nav>
+
+  <main class="post">
+    <article class="post-inner">
+      <a href="/blog/" class="hero-back">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        All posts
+      </a>
+      <header class="post-header">
+        <p class="eyebrow">Azure SQL</p>
+        <h1>Azure SQL scaling downtime: what happens and how to retry</h1>
+        <p class="post-lead">Changing the service objective of an Azure SQL database is an online operation until the very end, when connections are dropped and open transactions roll back. This post walks through what happens, how long each part takes, and what your application needs to survive it.</p>
+        <p class="post-meta"><span>By David García García</span><span><time datetime="2026-11-17">17 November 2026</time></span><span>9 min read</span></p>
+      </header>
+
+      <div class="prose">
+<p>Resizing an Azure SQL database is one of the easiest ways to buy performance or save money, and Microsoft describes it as having minimal downtime. Minimal is not zero, though. Every change of service tier or compute size ends with a switchover that drops the open connections, and how your application behaves during that moment decides whether anyone notices. This post covers where Azure SQL scaling downtime comes from, how long the whole operation runs, the error numbers your retry logic should handle, and the commands to start, watch and cancel a scale operation. Managed Instance works quite differently and gets its own short section.</p>
+
+<h2>What causes Azure SQL scaling downtime</h2>
+
+<p>Microsoft's page on <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-scale">scaling single database resources</a> splits the operation into two steps.</p>
+
+<p>First, the service creates a new compute instance with the requested tier and size. For some combinations of source and target, it also has to build a replica of the database on that new compute, which means copying the data. During this step the database stays online and your connections keep going to the original compute, so the application sees nothing except possibly some extra load.</p>
+
+<p>Second, routing switches to the new compute. Existing connections to the old one are dropped, and new connections land on the new one. For some tier changes the database files are detached and reattached at this point. Microsoft says the database is unavailable during the switch "generally for less than 30 seconds and often for only a few seconds". The <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/scale-resources">scale resources overview</a> adds that uncommitted transactions are rolled back when the old engine's connections are terminated.</p>
+
+<p>Two details matter in practice. If long-running transactions are open when connections are dropped, the switch can take longer while those transactions are recovered (accelerated database recovery reduces this, according to the same page). And no data is lost at any point. What you lose is in-flight work: a batch that was halfway through an update, a report query, a connection your pool thought was healthy.</p>
+
+<h2>How long a scale operation takes</h2>
+
+<p>The short unavailability at the end is only part of the story. The whole operation can run for minutes or hours, depending on whether data has to be copied. Microsoft publishes a latency table on the same scaling page; here is a condensed version.</p>
+
+<table>
+  <thead>
+    <tr><th>Change</th><th>Latency model</th><th>Typical duration (per Microsoft)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Within Basic or Standard S0–S1</td><td>Constant, independent of space used</td><td>Less than 5 minutes</td></tr>
+    <tr><td>Within Standard S2–S12 or General Purpose (single database)</td><td>Constant, independent of space used</td><td>Less than 5 minutes</td></tr>
+    <tr><td>Hyperscale to Hyperscale</td><td>Constant, independent of space used</td><td>Less than 2 minutes</td></tr>
+    <tr><td>To or from Premium or Business Critical, including Premium to Premium</td><td>Proportional to space used (data copy)</td><td>Less than 1 minute per GB used</td></tr>
+    <tr><td>Between the groups above (for example S1 to S3, or Standard to Hyperscale)</td><td>Proportional to space used (data copy)</td><td>Less than 1 minute per GB used</td></tr>
+  </tbody>
+</table>
+
+<p>The row that surprises people is Premium and Business Critical. Those tiers keep data on local storage, so moving from one Premium size to another still copies the database. A 300 GB Premium database can take a long time to scale even though only the compute size changes, while a General Purpose database of the same size usually finishes in minutes because its files live on remote storage and are reattached. Moving databases in or out of elastic pools follows similar rules, and Microsoft notes that heavy load during a data copy makes scaling slower, especially on small compute sizes.</p>
+
+<h2>Retry logic for transient errors</h2>
+
+<p>Microsoft's answer to the switchover is retry logic, and the scaling page explicitly asks you to have it in place before changing the tier. The general guidance in <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/troubleshoot-common-connectivity-issues">working with transient errors</a> is specific:</p>
+
+<ul>
+  <li>Wait about 5 seconds before the first retry, then grow the delay exponentially up to a maximum of 60 seconds.</li>
+  <li>If the error happened while connecting, retry the connection.</li>
+  <li>If it happened during a command, do not retry the command on the same connection. Open a fresh connection, then retry.</li>
+  <li>For writes, the retry must make sure the whole transaction either completed or was rolled back.</li>
+</ul>
+
+<p>The error numbers you will see around a switchover are mostly <code>40613</code> (database not currently available), <code>40197</code> (service error during failover, with a subcode such as 40143 or 40540 embedded), and <code>4060</code> (cannot open database, which can be transient while a database is in transition). The <a href="https://learn.microsoft.com/en-us/sql/connect/ado-net/internal-retry-logic-providers-sqlclient">Microsoft.Data.SqlClient built-in retry providers page</a> lists the full baseline set the driver treats as transient, including throttling errors such as <code>40501</code>, <code>10928</code>, <code>10929</code> and <code>49918</code>, and statement-level errors like deadlocks (<code>1205</code>). Transport errors such as <code>10054</code> (connection forcibly closed) are listed as worth adding on top.</p>
+
+<h3>Configurable retry logic in Microsoft.Data.SqlClient</h3>
+
+<p>Since version 3.0, Microsoft.Data.SqlClient has <a href="https://learn.microsoft.com/en-us/sql/connect/ado-net/configurable-retry-logic">configurable retry logic</a>. It is off by default, and you enable it by assigning a provider to a <code>SqlConnection</code>, a <code>SqlCommand</code>, or both. The built-in command providers skip retries when the command runs inside a transaction, which is correct but means they do not help much with write paths. A pattern that follows Microsoft's guidance is to let the driver retry opening the connection, and to wrap each unit of work in your own loop that opens a fresh connection and reruns the whole transaction:</p>
+
+<pre><code>using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
+
+public static class Db
+{
+    // Setting TransientErrors replaces the driver's built-in list, so include
+    // everything you want retried.
+    private static readonly int[] TransientErrors =
+    {
+        64, 233, 4060, 4221, 10053, 10054, 10060, 10928, 10929,
+        40143, 40197, 40501, 40540, 40613, 49918, 1205
+    };
+
+    private static readonly SqlRetryLogicBaseProvider OpenRetry =
+        SqlConfigurableRetryFactory.CreateExponentialRetryProvider(new SqlRetryLogicOption
+        {
+            NumberOfTries = 6,                          // initial attempt + 5 retries
+            DeltaTime = TimeSpan.FromSeconds(5),
+            MaxTimeInterval = TimeSpan.FromSeconds(60),
+            TransientErrors = TransientErrors
+        });
+
+    private static bool IsTransient(SqlException ex) =&gt;
+        ex.Errors.Cast&lt;SqlError&gt;().Any(e =&gt; TransientErrors.Contains(e.Number));
+
+    public static async Task RunInTransactionAsync(
+        string connectionString,
+        Func&lt;SqlConnection, SqlTransaction, Task&gt; work,
+        CancellationToken ct)
+    {
+        const int maxAttempts = 5;
+        var delay = TimeSpan.FromSeconds(5);
+
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                await using var conn = new SqlConnection(connectionString);
+                conn.RetryLogicProvider = OpenRetry;
+                await conn.OpenAsync(ct);
+
+                using var tx = conn.BeginTransaction();
+                await work(conn, tx);
+                tx.Commit();
+                return;
+            }
+            catch (SqlException ex) when (IsTransient(ex) &amp;&amp; attempt &lt; maxAttempts)
+            {
+                await Task.Delay(delay, ct);
+                delay = TimeSpan.FromSeconds(Math.Min(delay.TotalSeconds * 2, 60));
+            }
+        }
+    }
+}</code></pre>
+
+<p>Inside <code>work</code>, assign the transaction to every command (<code>cmd.Transaction = tx</code>). A few caveats apply. If the switchover happens exactly while <code>Commit</code> is in flight, you cannot tell from the client whether the transaction committed, so the work itself should be idempotent (an upsert, or a check for an idempotency key) before you retry it blindly. The <code>-2</code> client timeout is not in the list on purpose; Microsoft's docs point out that the built-in providers do not retry it either, so connection and command timeouts need to be long enough on their own.</p>
+
+<p>Be careful when you combine layers. SqlClient also has idle connection resiliency through the <code>ConnectRetryCount</code> and <code>ConnectRetryInterval</code> connection string keywords, and Microsoft's transient errors page warns that stacking it on top of your own retries multiplies the number of attempts. If you use an ORM or a resilience library, check what it already retries, so that you end up with one retry layer rather than several.</p>
+
+<h2>Scaling with T-SQL, Azure CLI and PowerShell</h2>
+
+<p>All three methods start the same asynchronous operation and return before the scale is finished. With T-SQL, use <a href="https://learn.microsoft.com/en-us/sql/t-sql/statements/alter-database-transact-sql?view=azuresqldb-current">ALTER DATABASE</a>. You need to be the server admin, the Microsoft Entra admin, a member of <code>dbmanager</code> in <code>master</code>, or <code>db_owner</code> in the database:</p>
+
+<pre><code>-- DTU model
+ALTER DATABASE [mydb] MODIFY (SERVICE_OBJECTIVE = 'S3');
+
+-- vCore model: General Purpose, standard-series (Gen5), 8 vCores
+ALTER DATABASE [mydb] MODIFY (SERVICE_OBJECTIVE = 'GP_Gen5_8');
+
+-- Check what the database is running now
+SELECT DATABASEPROPERTYEX('mydb', 'Edition')          AS edition,
+       DATABASEPROPERTYEX('mydb', 'ServiceObjective') AS service_objective,
+       DATABASEPROPERTYEX('mydb', 'MaxSizeInBytes')   AS max_size_bytes;</code></pre>
+
+<p>With the <a href="https://learn.microsoft.com/en-us/cli/azure/sql/db">Azure CLI</a>, <code>az sql db update</code> takes either a service objective name or an edition plus capacity. Add <code>--no-wait</code> if you do not want the shell to block until the operation completes:</p>
+
+<pre><code>az sql db update --resource-group "$RG" --server "$SERVER" --name "$DB" \
+  --edition Standard --service-objective S3 --no-wait
+
+az sql db update --resource-group "$RG" --server "$SERVER" --name "$DB" \
+  --edition GeneralPurpose --family Gen5 --capacity 8 --no-wait
+
+# List operations still running, then cancel one if needed
+az sql db op list --resource-group "$RG" --server "$SERVER" --database "$DB" \
+  --query "[?state=='InProgress'].name" --output tsv
+az sql db op cancel --resource-group "$RG" --server "$SERVER" --database "$DB" --name "$OPERATION"</code></pre>
+
+<p>In PowerShell, <a href="https://learn.microsoft.com/en-us/powershell/module/az.sql/set-azsqldatabase">Set-AzSqlDatabase</a> does the same, and <code>Get-AzSqlDatabaseActivity</code> and <code>Stop-AzSqlDatabaseActivity</code> list and cancel operations:</p>
+
+<pre><code>Set-AzSqlDatabase -ResourceGroupName $rg -ServerName $server -DatabaseName $db `
+  -Edition "Standard" -RequestedServiceObjectiveName "S3" -AsJob
+
+Get-AzSqlDatabaseActivity -ResourceGroupName $rg -ServerName $server -DatabaseName $db</code></pre>
+
+<h3>Checking progress with sys.dm_operation_status</h3>
+
+<p>From inside SQL, connect to <code>master</code> as a server-level principal and query <a href="https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-operation-status-azure-sql-database">sys.dm_operation_status</a>:</p>
+
+<pre><code>SELECT operation, state_desc, percent_complete, start_time, last_modify_time, error_desc
+FROM sys.dm_operation_status
+WHERE major_resource_id = 'mydb'
+ORDER BY start_time DESC;</code></pre>
+
+<p>Do not read too much into <code>percent_complete</code>. For a scale operation it is documented as 0, 50 or 100, so it tells you whether the operation has started and finished, not how far along the data copy is. Rows are kept for roughly an hour; for older history use the Azure Activity Log.</p>
+
+<h2>When not to scale</h2>
+
+<p>The switchover rolls back whatever is running, so avoid scaling during index rebuilds, large imports, long ETL batches or anything else that would have to start over. Schedule scale operations around those jobs, or make the jobs resumable.</p>
+
+<p>To scale down an Azure SQL database, the space it uses must fit within the maximum size of the target. Each service objective has its own maximum data size, listed in the resource limits pages, and the operation fails if the database is bigger. Check used space before planning a downgrade:</p>
+
+<pre><code>SELECT CAST(SUM(CAST(FILEPROPERTY(name, 'SpaceUsed') AS bigint)) * 8 / 1024.0 AS decimal(18, 2)) AS data_space_used_mb
+FROM sys.database_files
+WHERE type_desc = 'ROWS';</code></pre>
+
+<p>Some other rules from the same page: scaling up does not raise the max size unless you ask for it; with geo-replication you upgrade the secondaries first and downgrade the primary first; downgrading from Premium to Standard can add extra storage charges if the max size is above what the target includes; and moving to Basic shortens backup retention. Databases that use In-Memory OLTP cannot move from Premium or Business Critical to Standard or General Purpose at all.</p>
+
+<p>Billing works per hour. You pay for the highest service objective that applied during each hour, so scaling up for ten minutes costs the same as a full hour at the larger size. If you scale on a schedule, align changes with hour boundaries where you can. To estimate savings, multiply the hours spent at each size by that size's hourly rate from Microsoft's official <a href="https://azure.microsoft.com/en-us/pricing/details/azure-sql-database/single/">Azure SQL Database pricing page</a>, and compare the total with the hours you would otherwise spend at the larger size. Use the rate for your own region, since prices vary by region and change over time.</p>
+
+<h2>Azure SQL Managed Instance scale-up downtime is a different problem</h2>
+
+<p>Managed Instance scaling is a much heavier operation. According to the <a href="https://learn.microsoft.com/en-us/azure/azure-sql/managed-instance/management-operations-overview">management operations overview</a>, an update usually resizes or creates a VM group, seeds data where needed, and then fails over to a new engine process. The <a href="https://learn.microsoft.com/en-us/azure/azure-sql/managed-instance/management-operations-duration">operation duration page</a> says 95% of vCore scaling operations on General Purpose finish within 60 minutes, and on Business Critical it is 60 minutes plus the time to seed every database to the new replicas (on average about 220 GB per hour). The instance stays available throughout except for the final failover: up to 20 seconds on Business Critical, up to 2 minutes on General Purpose, and on Next-gen General Purpose some databases can take up to 10 minutes to come back when many databases are reattached. Microsoft explicitly advises against scaling while long-running transactions are running. In practice that makes Managed Instance a poor candidate for frequent scheduled scaling; plan resizes like maintenance windows.</p>
+
+<h2>Scheduling scale operations</h2>
+
+<p>Azure SQL Database autoscale only exists in the serverless compute tier, which adjusts vCores within a range you set and can pause when idle. Whether that or provisioned compute fits better is covered in <a href="/blog/azure-sql-serverless-vs-provisioned/">Azure SQL serverless vs provisioned</a>. For provisioned databases and elastic pools, any automatic scaling is something you build or run yourself, with all the constraints described above.</p>
+
+<p>The usual approach is a scheduled job (an Automation runbook, a Function with a timer trigger, a pipeline) that calls <code>az sql db update</code> or <code>Set-AzSqlDatabase</code>, waits for completion and logs the result. I wrote about <a href="https://medium.com/@deividb/azure-sql-database-and-sql-pool-autoscaling-0cea117713c7">automating Azure SQL Database and SQL pool scaling on Medium</a>. If you would rather not maintain that code, our <a href="/azure-autoscaler/">Azure Autoscaler</a> resizes Azure SQL databases and elastic pools on metrics, forecasts or schedules. Whatever runs the schedule, scale up early enough that a data copy finishes before the load arrives, and scale down only after batch jobs are done.</p>
+
+<h2>A practical next step</h2>
+
+<p>Before you scale anything in production, test what your application does during a switchover. Scale a non-production copy of the database between two objectives while a load test runs, and watch which errors reach your logs and whether any requests fail. If you see <code>40613</code> or <code>40197</code> surfacing to users, fix the retry path first. Then look up your production database's tier in the latency table, so you know whether a resize will take minutes or will copy every gigabyte.</p>
+      </div>
+
+      <aside class="card post-cta" aria-label="Azure Autoscaler">
+        <p class="eyebrow">Azure Autoscaler</p>
+        <h2>Where Azure Autoscaler fits</h2>
+        <p>Azure Autoscaler runs as a container in your own environment and resizes Azure SQL databases and elastic pools based on metrics, forecasts or schedules you define. You can run it in dry-run mode first to see what it would change.</p>
+        <a href="/azure-autoscaler/" class="btn btn-primary">
+          See Azure Autoscaler
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+      </aside>
+
+      <p class="post-footer-nav"><a href="/blog/">← Back to all posts</a></p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" class="footer-logo-link">
+        <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+      </a>
+      <p class="footer-tagline">Infrastructure tooling that fills the gaps. Self-hosted, production-grade.</p>
+    </div>
+    <div class="footer-columns">
+      <div>
+        <p class="footer-heading">Products</p>
+        <ul class="footer-links">
+          <li><a href="/azure-autoscaler/">Azure Autoscaler</a></li>
+          <li><a href="/storage-observer/">Storage Observer</a></li>
+          <li><a href="/traefik-precompiled/">Traefork</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-heading">Company</p>
+        <ul class="footer-links">
+          <li><a href="/consulting/">Consulting</a></li>
+          <li><a href="/support/">Support</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/consulting/#contact">Contact</a></li>
+          <li><a href="/traefik-precompiled/#licenses">Open Source Licenses</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Mutex Studio S.L. All rights reserved.</p>
+    <nav class="footer-legal" aria-label="Legal">
+      <a href="/aviso-legal/">Aviso legal</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/cookies/">Cookies</a>
+      <a href="#" data-cookie-settings>Cookie settings</a>
+    </nav>
+    <p>MUTEX STUDIO S.L. · NIF B05790308 · <a href="mailto:info@mutexstudio.com">info@mutexstudio.com</a></p>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js?v=4"></script>
+</body>
+</html>

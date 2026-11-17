@@ -1,0 +1,160 @@
+<!--
+{
+  "title": "Azure SQL serverless vs provisioned: working out which costs less",
+  "description": "How Azure SQL serverless and provisioned compute are billed, how to work out the break-even for a database, and where scheduled scaling or elastic pools fit.",
+  "date": "2026-11-17",
+  "product": "autoscaler",
+  "eyebrow": "Azure SQL costs",
+  "lead": "Serverless bills for the compute a database uses each second, and provisioned bills for the compute you reserve each hour. Which one is cheaper depends on how often the database is idle, and you can work that out from metrics you already have.",
+  "cta": "If your databases follow a predictable daily or weekly pattern, Azure Autoscaler can keep them on provisioned compute and change their size on a schedule or from Azure Monitor metrics. It runs as a container in your own environment and has a dry-run mode, so you can see what it would change before it changes anything."
+}
+-->
+<p>Choosing between Azure SQL serverless vs provisioned compute usually comes up in one of two ways. Either someone is creating a new database and the portal offers both, or an existing database costs more than expected and serverless looks like an easy saving. In both cases the answer depends on the shape of the workload rather than on its size, and Microsoft documents the billing rules precisely enough to calculate it. This post goes through how each model bills, how to work out the break-even for your own database, the situations where serverless ends up costing more, and the two alternatives worth comparing: provisioned compute with scheduled scaling, and elastic pools.</p>
+
+<h2>How serverless compute is billed</h2>
+
+<p><a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview">Serverless</a> is a compute tier of the vCore purchasing model for single databases. It is available in the General Purpose and Hyperscale service tiers on standard-series (Gen5) hardware, and not in Business Critical or the DTU model. You configure a minimum and a maximum number of vCores, and the service scales compute within that range.</p>
+
+<p>The billing rule is in the <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-billing">serverless billing article</a>. Every second, Azure bills the larger of CPU used and memory used, with memory converted to vCores at 3 GB per vCore. If usage is below the minimum you configured, you pay for the minimum. Written out:</p>
+
+<pre><code>billed vCores (per second) = max(min_vcores, vcores_used, min_memory_gb / 3, memory_gb_used / 3)
+compute cost               = vCore unit price (per vCore-second) * sum of billed vCores over all seconds</code></pre>
+
+<p>Two parts of that formula matter more than they first appear.</p>
+
+<p>The first is memory. SQL Server uses memory for the buffer pool and keeps data cached after queries finish, so a database can be billed on memory while its CPU is close to idle. The worked example in Microsoft's billing article includes an hour where the database uses one vCore and 12 GB of memory, and is billed for 4 vCores because of the memory.</p>
+
+<p>The second is the minimum. While the database is online, you never pay less than the larger of the minimum vCores and the minimum memory divided by three. Microsoft's examples: with 1 minimum vCore (3 GB minimum memory) the floor is 1 vCore; with 0.5 minimum vCores (2.1 GB minimum memory) it is 0.7 vCores. The pricing calculator shows which minimum memory goes with each combination of minimum and maximum vCores.</p>
+
+<p>Storage is billed the same way as in provisioned compute. Also note that <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-billing">Azure Hybrid Benefit and reservation discounts do not apply to serverless</a>. If you already pay for provisioned compute with either of those, any comparison has to use your discounted provisioned price.</p>
+
+<h3>Azure SQL serverless auto-pause</h3>
+
+<p>Auto-pause is what lets serverless cost nothing for compute. According to the <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-auto-pause-resume">auto-pause and auto-resume documentation</a>, a database pauses when, for the whole auto-pause delay, it has zero sessions and zero CPU for user workload. While paused, only storage is billed. The delay is configurable:</p>
+
+<ul>
+<li>General Purpose: minimum 15 minutes, default 60, maximum 10,080 (seven days), or <code>-1</code> to disable auto-pause.</li>
+<li>Hyperscale: auto-pause is in preview, with a minimum and default of 60 minutes. Named replicas are not supported with auto-pause during the preview.</li>
+</ul>
+
+<p>The delay is billed. After the last session closes, you keep paying the minimum compute until the delay ends, and Microsoft adds that pausing itself generally takes 1 to 10 minutes after the criteria are met. Resuming generally takes about a minute. The first connection to a paused database fails with error 40613 while it resumes, so applications need retry logic, which they should have anyway.</p>
+
+<h3>Azure SQL Hyperscale vs serverless in General Purpose</h3>
+
+<p>Hyperscale serverless follows the same formula, but every replica is billed separately. The primary, each HA replica and each named replica have their own minimum and their own usage, and HA replica usage appears in a separate metric, <code>app_cpu_billed_HA_replicas</code>. A Hyperscale serverless database with one HA replica therefore pays at least two minimums whenever it is online. Combined with the preview status of auto-pause and the 60-minute minimum delay, Hyperscale serverless is mainly a way to get automatic compute scaling rather than a way to pay nothing at night.</p>
+
+<h2>How provisioned compute is billed</h2>
+
+<p>The <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/service-tiers-sql-database-vcore">vCore purchasing model documentation</a> describes it in one sentence: the provisioned compute tier bills for the amount of compute provisioned at a fixed price per hour, regardless of workload activity. A database with 8 vCores costs the same in an idle hour as in a busy one. Storage and backup storage are billed separately and in the same way for both compute tiers, so for this comparison you can usually ignore them.</p>
+
+<p>Provisioned compute is eligible for Azure Hybrid Benefit and reservations in General Purpose and Business Critical. For Hyperscale, the same page explains that Azure Hybrid Benefit is not available for new databases because Hyperscale has no SQL license fee.</p>
+
+<h2>Azure SQL serverless vs provisioned cost: finding the break-even</h2>
+
+<p>Prices vary by region and change over time, so we will not quote any here. Open the <a href="https://azure.microsoft.com/en-us/pricing/details/azure-sql-database/single/">Azure SQL Database pricing page</a> for your region and tier, and note two numbers:</p>
+
+<ul>
+<li><code>P</code>: the provisioned price per vCore per hour, after any Hybrid Benefit or reservation discount you actually get.</li>
+<li><code>S</code>: the serverless price per vCore per second. Multiply by 3,600 to get <code>S_h</code>, the serverless price per vCore-hour.</li>
+</ul>
+
+<p>For a provisioned database with <code>V</code> vCores running <code>H</code> hours in a month, compute costs <code>P × V × H</code>. For a serverless database, it costs <code>S × B</code>, where <code>B</code> is the total vCore-seconds billed. If you define <code>A</code> as the average billed vCores over the month (that is, <code>B / (H × 3600)</code>), serverless is cheaper when:</p>
+
+<pre><code>A &lt; V × (P / S_h)</code></pre>
+
+<p>So the question becomes how many vCores, on average across every hour including nights and weekends, serverless would bill. Paused hours count as zero, idle-but-online hours count as the minimum, and busy hours count as whatever CPU or memory the database used. The ratio <code>P / S_h</code> comes straight from the pricing page, and it tells you what fraction of the provisioned size the serverless average has to stay below.</p>
+
+<p>A rough estimate for a database with a daily pattern looks like this:</p>
+
+<pre><code>A ≈ (hours_active × avg_billed_vcores_when_active
+     + hours_idle_online × minimum_billed_vcores
+     + hours_paused × 0) / H
+
+hours_idle_online ≥ number_of_idle_periods × auto_pause_delay_in_hours</code></pre>
+
+<h3>Measuring it rather than guessing</h3>
+
+<p>If you can, move a copy of the database (or a non-production environment with a representative load) to serverless for a couple of weeks and read the <code>app_cpu_billed</code> metric. The <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-monitor">monitoring documentation</a> describes it as the amount of compute billed, in vCore-seconds; multiply it by the unit price and you have the actual compute cost. With the Azure CLI:</p>
+
+<pre><code>DB_ID=$(az sql db show -g my-rg -s my-server -n my-db --query id -o tsv)
+
+az monitor metrics list \
+  --resource "$DB_ID" \
+  --metrics app_cpu_billed \
+  --aggregation Total \
+  --interval 1h \
+  --offset 14d \
+  --query "value[0].timeseries[0].data[].total" -o json \
+  | jq 'map(select(. != null)) | add'</code></pre>
+
+<p>That gives total billed vCore-seconds over the last 14 days. Divide by <code>14 × 24 × 3600</code> to get <code>A</code>, and compare with <code>V × (P / S_h)</code>. The hourly series is also useful on its own: hours that sit exactly at your minimum are idle hours where the database did not pause.</p>
+
+<p>Moving a database between tiers is a normal update, as shown in <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-create-configure">Create and configure a serverless database</a>:</p>
+
+<pre><code>az sql db update -g my-rg -s my-server -n my-db \
+  --edition GeneralPurpose \
+  --compute-model Serverless \
+  --family Gen5 \
+  --min-capacity 1 \
+  --capacity 4 \
+  --auto-pause-delay 60</code></pre>
+
+<p>Changing tier is a scaling operation like any other, with a short disconnection at the end. We cover what happens during that switch in <a href="/blog/azure-sql-scaling-downtime/">a separate post on Azure SQL scaling downtime</a>.</p>
+
+<h2>When serverless ends up more expensive</h2>
+
+<p>Microsoft's own guidance is that serverless suits single databases with intermittent, unpredictable usage and low average utilization, and provisioned suits regular usage with higher average utilization. In practice, these are the cases where we see serverless lose the comparison.</p>
+
+<h3>Steady load</h3>
+
+<p>If the database is busy most hours of the day, <code>A</code> ends up close to the provisioned size, and the comparison comes down to the two unit prices plus any provisioned discounts that serverless cannot use. A database used from early morning to late evening on weekdays may still pause at night and at weekends; one that serves a customer-facing application across time zones probably will not.</p>
+
+<h3>Connections and jobs that keep it awake</h3>
+
+<p>Auto-pause needs zero sessions for the whole delay. The documentation states that open sessions are the most common reason a serverless database does not pause. Typical sources are connection pools that keep a minimum number of idle connections, health checks that connect to the database, monitoring agents, scheduled jobs that run more often than the delay, and a query window someone left open. Auto-resume is also triggered by management operations, such as viewing auditing records, reading Query Store settings, running vulnerability assessment scans or changing tags on the database. The full list is in the <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-auto-pause-resume">auto-pause article</a>.</p>
+
+<p>To see which sessions are connected right now, Microsoft provides this query (run it, then disconnect, since your own session also blocks auto-pause):</p>
+
+<pre><code>SELECT session_id, host_name, program_name, login_name, status,
+       login_time, last_request_start_time, last_request_end_time
+FROM sys.dm_exec_sessions AS s
+INNER JOIN sys.dm_resource_governor_workload_groups AS wg
+    ON s.group_id = wg.group_id
+WHERE s.session_id &lt;&gt; @@SPID
+  AND (
+        (wg.name LIKE 'UserPrimaryGroup.DB%'
+         AND TRY_CAST(RIGHT(wg.name, LEN(wg.name) - LEN('UserPrimaryGroup.DB') - 2) AS int) = DB_ID())
+        OR wg.name = 'DACGroup'
+      );</code></pre>
+
+<h3>Features that block auto-pause</h3>
+
+<p>Some features prevent auto-pause entirely, and the documentation recommends disabling auto-pause when you use them: active geo-replication and failover groups, long-term backup retention, a DNS alias on the logical server, the sync database in SQL Data Sync, and using the database as an elastic jobs job database. Any of these turns serverless into a database that is always online and always billed at least the minimum, at the serverless unit price and without Hybrid Benefit or reservations. Long-term retention in particular is a common compliance requirement, so check for it before anything else.</p>
+
+<h2>Provisioned compute with scheduled scaling</h2>
+
+<p>Many databases that look like serverless candidates are not intermittent at all. They are busy during working hours and quiet at night and at weekends, and the pattern repeats every week. For those, a third approach often compares well: keep provisioned compute, keep your discounts, and change the size on a schedule. Since provisioned compute is billed per hour, a database that runs at a large size for the working day and a small size for the rest costs roughly the weighted average of the two hourly prices.</p>
+
+<p>The change itself is the same command you would run by hand:</p>
+
+<pre><code>az sql db update -g my-rg -s my-server -n my-db --service-objective GP_Gen5_8   # before working hours
+az sql db update -g my-rg -s my-server -n my-db --service-objective GP_Gen5_2   # after working hours</code></pre>
+
+<p>Azure has no built-in setting to do this for Azure SQL, so teams usually run these commands from Azure Automation, a pipeline or a scheduled job. We built <a href="/azure-autoscaler/">Azure Autoscaler</a> for this case: it runs as a container in your environment and resizes Azure SQL databases and elastic pools on schedules or from Azure Monitor metrics. Whatever runs the schedule, remember that each resize ends with a brief disconnection, so schedule them outside peak use and make sure the application retries.</p>
+
+<p>The difference from serverless is predictability. You choose the sizes and the times, the database never pauses, there is no resume delay on the first connection, and the bill is the same every week.</p>
+
+<h2>Azure SQL serverless vs elastic pool</h2>
+
+<p>If you have several databases, compare an <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/elastic-pool-overview">elastic pool</a> as well. Serverless is a tier for single databases. A pool is provisioned compute shared by databases on the same server: you pay for each hour the pool exists at its configured vCores or eDTUs, with no per-database charge, and in the vCore model the unit price for pools is the same as for single databases.</p>
+
+<p>Pools work best when there are many databases with low average use and peaks at different times, which is common in SaaS applications with one database per tenant. Microsoft's sizing estimate for the vCore model is:</p>
+
+<pre><code>pool vCores ≈ MAX(total_dbs × avg_vcores_per_db,
+                  concurrently_peaking_dbs × peak_vcores_per_db)</code></pre>
+
+<p>Take the smallest pool size above that number and compare its price with what the databases would cost individually, provisioned or serverless. Features such as geo-replication, which block auto-pause in serverless, cost nothing extra in this comparison, because nothing in a pool pauses to begin with. Databases that are busy at the same times do not share well and are better left as single databases.</p>
+
+<h2>A practical next step</h2>
+
+<p>Pick one database and pull two weeks of hourly <code>cpu_percent</code> from Azure Monitor. If it is already serverless, use <code>app_cpu_billed</code> instead. Count the hours that are effectively idle, check the database against the list of features that block auto-pause, and run the break-even formula with the unit prices for your region. If most idle hours fall in predictable blocks, also price the scheduled-scaling option. If you have a group of small databases with uneven peaks, price a pool. The cheapest option is usually obvious once you have the hourly data in front of you.</p>

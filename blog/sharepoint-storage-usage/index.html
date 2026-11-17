@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="How SharePoint storage usage is counted, which built-in reports to check, and PnP PowerShell scripts to find large sites, libraries, versions and recycle bins.">
+  <title>SharePoint storage usage: find what fills your tenant quota — Mutex Studio</title>
+
+  <link rel="icon" href="/assets/img/favicons/icon.svg?v=5" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png?v=5">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png?v=5">
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/img/favicons/favicon.ico?v=5">
+  <link rel="manifest" href="/assets/img/favicons/site.webmanifest">
+  <link rel="stylesheet" href="/assets/css/site.css?v=20">
+  <link rel="canonical" href="https://www.mutexstudio.com/blog/sharepoint-storage-usage/">
+  <link rel="alternate" type="application/rss+xml" title="Mutex Studio blog" href="https://www.mutexstudio.com/blog/feed.xml">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Mutex Studio">
+  <meta property="og:title" content="SharePoint storage usage: find what fills your tenant quota — Mutex Studio">
+  <meta property="og:description" content="How SharePoint storage usage is counted, which built-in reports to check, and PnP PowerShell scripts to find large sites, libraries, versions and recycle bins.">
+  <meta property="og:url" content="https://www.mutexstudio.com/blog/sharepoint-storage-usage/">
+  <meta property="og:image" content="https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta property="article:published_time" content="2026-11-17">
+  <meta property="article:modified_time" content="2026-11-17">
+  <meta property="article:author" content="David García García">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "SharePoint storage usage: find what fills your tenant quota",
+  "description": "How SharePoint storage usage is counted, which built-in reports to check, and PnP PowerShell scripts to find large sites, libraries, versions and recycle bins.",
+  "datePublished": "2026-11-17",
+  "dateModified": "2026-11-17",
+  "inLanguage": "en",
+  "wordCount": 1799,
+  "url": "https://www.mutexstudio.com/blog/sharepoint-storage-usage/",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.mutexstudio.com/blog/sharepoint-storage-usage/"
+  },
+  "image": "https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png",
+  "author": {
+    "@type": "Person",
+    "name": "David García García",
+    "url": "https://medium.com/@deividb"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Mutex Studio",
+    "url": "https://www.mutexstudio.com/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png"
+    }
+  }
+}
+  </script>
+</head>
+
+<body class="accent-violet page-blog">
+
+  <nav class="site-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+    </a>
+
+    <div class="nav-desktop">
+      <div class="nav-group">
+        <button type="button" class="nav-trigger" aria-haspopup="true">
+          Products
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="/azure-autoscaler/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--blue">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Azure Autoscaler</div>
+              <div class="nav-dropdown-desc">Smart resource scaling</div>
+            </div>
+          </a>
+          <a href="/storage-observer/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--violet">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Storage Observer</div>
+              <div class="nav-dropdown-desc">File storage at any scale</div>
+            </div>
+          </a>
+          <a href="/traefik-precompiled/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--emerald">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Traefork</div>
+              <div class="nav-dropdown-desc">Soft-fork, plugins compiled in</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <a href="/consulting/" class="nav-link nav-link-consulting">Consulting</a>
+      <a href="/support/" class="nav-link nav-link-support">Support</a>
+      <a href="/blog/" class="nav-link nav-link-blog">Blog</a>
+    </div>
+
+    <a href="/consulting/#contact" class="nav-cta">Talk to us</a>
+
+    <button type="button" id="mobile-menu-btn" class="nav-mobile-btn" aria-label="Open menu">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="nav-mobile">
+    <p class="nav-mobile-label">Products</p>
+    <a href="/azure-autoscaler/" class="nav-mobile-link">Azure Autoscaler</a>
+    <a href="/storage-observer/" class="nav-mobile-link">Storage Observer</a>
+    <a href="/traefik-precompiled/" class="nav-mobile-link">Traefork</a>
+    <div class="nav-mobile-divider"></div>
+    <a href="/consulting/" class="nav-mobile-link">Consulting</a>
+    <a href="/support/" class="nav-mobile-link">Support</a>
+    <a href="/blog/" class="nav-mobile-link">Blog</a>
+    <a href="/consulting/#contact" class="nav-mobile-cta">Talk to us</a>
+  </div>
+</nav>
+
+  <main class="post">
+    <article class="post-inner">
+      <a href="/blog/" class="hero-back">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        All posts
+      </a>
+      <header class="post-header">
+        <p class="eyebrow">SharePoint storage</p>
+        <h1>SharePoint storage usage: find what fills your tenant quota</h1>
+        <p class="post-lead">When the storage bar in the SharePoint admin center turns red, you need to know which sites, libraries and folders are using the space. These are the reports and scripts we use to find out, and what each of them leaves out.</p>
+        <p class="post-meta"><span>By David García García</span><span><time datetime="2026-11-17">17 November 2026</time></span><span>9 min read</span></p>
+      </header>
+
+      <div class="prose">
+<p>SharePoint storage usage tends to get attention only once the tenant is close to its limit. At that point the admin center tells you the total but not much about where it went, and the useful detail is spread across the admin center, per-site pages and PowerShell. This post covers how the quota is calculated, what happens when you go over it, and how to work down from tenant to site, library, file version and recycle bin until you know what to clean up or which limits to change.</p>
+
+<h2>How the tenant storage quota is calculated</h2>
+
+<p>All SharePoint sites in a tenant draw from one pool. Microsoft's <a href="https://learn.microsoft.com/en-us/office365/servicedescriptions/sharepoint-online-service-description/sharepoint-online-limits">SharePoint limits service description</a> gives the formula for most business and enterprise plans: 1 TB plus 10 GB per licence purchased. Some plans contribute differently (frontline plans, for example, are listed with 1 TB and no per-licence amount), and Office 365 Extra File Storage add-ons are added on top. Storage is counted in binary gigabytes, so 1 GB is 1,073,741,824 bytes. The same page notes that users' OneDrive storage is not part of this pool.</p>
+
+<p>Some details matter when you are reading the numbers:</p>
+
+<ul>
+<li>The site recycle bins count against the total. The limits page recommends monitoring them and emptying them regularly.</li>
+<li>Deleted sites waiting in the admin center's recycle bin do not count, according to <a href="https://learn.microsoft.com/en-us/sharepoint/manage-site-collection-storage-limits">Manage site storage limits</a>.</li>
+<li>The figures lag. That same page says storage usage doesn't include changes made in the last 24 to 48 hours, so a cleanup won't show up in the bar straight away.</li>
+<li>A single site can hold at most 25 TB, whatever the tenant total is.</li>
+</ul>
+
+<h3>When the SharePoint storage limit is exceeded</h3>
+
+<p>Going over the limit doesn't stop anything immediately, but it is not a state you can stay in. The service description says that if a tenant keeps operating above its storage limit, it risks being put into read-only mode, where users may be unable to add or modify content until usage drops or more capacity is bought. To get out of read-only mode you can reduce usage, buy extra SharePoint storage (sold in 1 GB increments) or buy licences that add to the pool. After a purchase, a <strong>Confirm purchase</strong> option can lift read-only mode for up to 14 days while the new capacity is applied, and it can be used only once in a 365-day period. For the price of extra storage, check the Microsoft 365 admin center for your agreement; it varies by region and changes over time.</p>
+
+<p>If you use manual site storage limits instead of the default pooled mode, an individual site can also hit its own limit before the tenant does. Site owners then see the site as full even though the tenant has space.</p>
+
+<h2>Built-in SharePoint storage usage reports</h2>
+
+<h3>Active sites in the SharePoint admin center</h3>
+
+<p>The <strong>Active sites</strong> page shows the tenant total and the space still available in the upper right corner. The site list has a <strong>Storage used</strong> column that you can sort, there is a built-in <strong>Largest sites</strong> view, and <strong>Export</strong> on the command bar downloads the current view as CSV (<a href="https://learn.microsoft.com/en-us/sharepoint/customize-admin-center-site-list">Customize the SharePoint admin center site list</a>). For most tenants this is the quickest first look.</p>
+
+<p>The list has gaps. According to <a href="https://learn.microsoft.com/en-us/sharepoint/manage-sites-in-new-admin-center">Manage sites in the SharePoint admin center</a>, Teams private and shared channel sites are left out of the main list and appear through the <strong>Channel sites</strong> column of their parent team instead, and OneDrive sites are not shown at all. If the Storage used column doesn't add up to the tenant total, channel sites are worth checking first.</p>
+
+<h3>The SharePoint storage usage report in the Microsoft 365 admin center</h3>
+
+<p>Under <strong>Reports &gt; Usage &gt; SharePoint &gt; Storage</strong>, the Microsoft 365 admin center has a <a href="https://learn.microsoft.com/en-us/microsoft-365/admin/activity-reports/sharepoint-storage-reports?view=o365-worldwide">SharePoint Storage report</a> with total usage, quota and a usage trend that projects future growth. It refreshes every 48 to 72 hours. It works well for capacity planning and for showing management the growth curve. It doesn't tell you which site is responsible, so you still need the Active sites list or a script for that.</p>
+
+<h3>Storage Metrics for a single site</h3>
+
+<p>Inside a site, a site collection administrator can open <strong>Site settings &gt; Site Collection Administration &gt; Storage Metrics</strong>, or go straight to <code>/_layouts/15/storman.aspx</code> under the site URL. This page breaks the site down by library and list, and you can click into folders to see their sizes. It is also where a site admin can select <strong>Request more quota</strong> when manual limits are in use, as described in the Microsoft Learn page on site storage limits.</p>
+
+<p>Storage Metrics is the most detailed view Microsoft provides, but it covers one site at a time and you have to click through it. It has no export, and you can't compare folders across sites or see how a folder grew over time.</p>
+
+<h2>SharePoint storage usage report with PowerShell</h2>
+
+<p>For anything repeatable, PnP PowerShell is the practical option. It needs PowerShell 7.4.0 or later, and since 9 September 2024 you have to <a href="https://pnp.github.io/powershell/articles/registerapplication.html">register your own Entra ID application</a> before you can connect; the shared multi-tenant app is no longer an option. Registration is a one-off step:</p>
+
+<pre><code>Install-Module PnP.PowerShell -Scope CurrentUser
+
+# One-off: creates an app registration for interactive sign-in; note its client ID
+Register-PnPEntraIDAppForInteractiveLogin -ApplicationName "PnP.PowerShell" -Tenant contoso.onmicrosoft.com</code></pre>
+
+<p>After that, connect with the client ID as described in the <a href="https://pnp.github.io/powershell/articles/authentication.html">PnP authentication docs</a>. To list sites you connect to the admin site, and <a href="https://pnp.github.io/powershell/cmdlets/Get-PnPTenantSite.html">Get-PnPTenantSite</a> requires SharePoint administrator access:</p>
+
+<pre><code>$clientId = "&lt;your-app-client-id&gt;"
+Connect-PnPOnline -Url https://contoso-admin.sharepoint.com -Interactive -ClientId $clientId
+
+Get-PnPTenantSite |
+  Sort-Object StorageUsageCurrent -Descending |
+  Select-Object Url, Template,
+    @{ n = 'UsedGB';  e = { [math]::Round($_.StorageUsageCurrent / 1024, 2) } },
+    @{ n = 'QuotaGB'; e = { [math]::Round($_.StorageQuota / 1024, 2) } } |
+  Export-Csv .\sites-by-size.csv -NoTypeInformation</code></pre>
+
+<p><code>StorageUsageCurrent</code> and <code>StorageQuota</code> are in megabytes, which is why the script divides by 1024. Add <code>-IncludeOneDriveSites</code> if you also want OneDrive accounts in the list, but remember they don't count against the SharePoint pool.</p>
+
+<h3>Libraries inside a site</h3>
+
+<p>Once you know which sites are large, connect to one of them and break it down by document library with <a href="https://pnp.github.io/powershell/cmdlets/Get-PnPFolderStorageMetric.html">Get-PnPFolderStorageMetric</a>. Template 101 is a document library, and leaving hidden libraries in the output is deliberate, because system libraries such as the Preservation Hold Library can be large:</p>
+
+<pre><code>Connect-PnPOnline -Url https://contoso.sharepoint.com/sites/projects -Interactive -ClientId $clientId
+
+Get-PnPList | Where-Object { $_.BaseTemplate -eq 101 } | ForEach-Object {
+  $m = Get-PnPFolderStorageMetric -List $_
+  [pscustomobject]@{
+    Library      = $_.Title
+    Hidden       = $_.Hidden
+    Files        = $m.TotalFileCount
+    TotalGB      = [math]::Round($m.TotalSize / 1GB, 2)
+    FileStreamGB = [math]::Round($m.TotalFileStreamSize / 1GB, 2)
+    LastModified = $m.LastModified
+  }
+} | Sort-Object TotalGB -Descending | Format-Table -AutoSize</code></pre>
+
+<p>The cmdlet returns SharePoint's own folder storage metrics unchanged. When <code>TotalSize</code> is much larger than <code>TotalFileStreamSize</code>, version history is the first thing we look at. You can pass <code>-FolderSiteRelativeUrl "Shared Documents/Subfolder"</code> to measure a single folder, though walking a whole tree that way means one call per folder.</p>
+
+<h3>Find large files in a SharePoint library</h3>
+
+<p>To find large files in a SharePoint library, read the file size field for every item. Use paging on large libraries with <a href="https://pnp.github.io/powershell/cmdlets/Get-PnPListItem.html">Get-PnPListItem</a>:</p>
+
+<pre><code>Get-PnPListItem -List "Documents" -PageSize 2000 -Fields "FileRef","File_x0020_Size","FSObjType" |
+  Where-Object { $_["FSObjType"] -eq 0 } |
+  Sort-Object { [int64]$_["File_x0020_Size"] } -Descending |
+  Select-Object -First 50 @{ n = 'Path'; e = { $_["FileRef"] } },
+    @{ n = 'SizeMB'; e = { [math]::Round([int64]$_["File_x0020_Size"] / 1MB, 1) } }</code></pre>
+
+<p>This is the size of the current version only. A 40 MB presentation that has been saved a few hundred times can use far more space than a single large video, and the file list won't show that.</p>
+
+<h2>SharePoint version history storage</h2>
+
+<p>Every version of a file is stored and counts toward the quota, and SharePoint allows up to 50,000 major versions per file. How many versions are kept depends on the <a href="https://learn.microsoft.com/en-us/sharepoint/document-library-version-history-limits">version history limits</a>, which can be set for the organization, a site or a library. New libraries inherit the organization setting unless the site overrides it. There are two modes:</p>
+
+<ul>
+<li><strong>Automatic</strong> keeps every version from the last 30 days (within a 500-version cap), then thins older versions to hourly, daily and finally weekly snapshots. <a href="https://learn.microsoft.com/en-us/sharepoint/plan-version-storage">Plan version storage</a> describes the algorithm.</li>
+<li><strong>Manual</strong> keeps a fixed number of major versions, optionally with an expiry in days.</li>
+</ul>
+
+<p>Two points often cause confusion. Changing the limits does not trim versions that already exist; those stay until you queue a trim job. Also, for items under a retention policy or eDiscovery hold, the library's version limits are ignored until the retention period ends or the hold is released, so a site under retention can keep growing even with tight limits.</p>
+
+<h3>The version storage usage report</h3>
+
+<p>To see how much space versions use on a site, generate the <a href="https://learn.microsoft.com/en-us/sharepoint/version-storage-report-site">version storage usage report</a> with the SharePoint Online Management Shell. It queues a background job that writes a CSV with one row per file version to a document library you choose:</p>
+
+<pre><code>Connect-SPOService -Url https://contoso-admin.sharepoint.com
+
+$site   = "https://contoso.sharepoint.com/sites/projects"
+$report = "https://contoso.sharepoint.com/sites/projects/Reports/VersionReport.csv"
+
+New-SPOSiteFileVersionExpirationReportJob -Identity $site -ReportUrl $report
+
+# Repeat until the JSON status is "completed"
+Get-SPOSiteFileVersionExpirationReportJobProgress -Identity $site -ReportUrl $report</code></pre>
+
+<p>There is also a library-scoped version, <code>New-SPOListFileVersionExpirationReportJob -Site $site -List "Documents" -ReportUrl $report</code>. The report takes more than 24 hours even on small sites and a few days on large ones, and you must not edit the file while it is being written. The <a href="https://learn.microsoft.com/en-us/sharepoint/tutorial-generate-version-usage-report">tutorial for analysing the report</a> provides an Excel template and a script. If you only want to know which files carry the most version weight, a few lines are enough. Columns ending in <code>.Compact</code> leave the value empty when it repeats from the previous row, so the script carries it forward:</p>
+
+<pre><code>$file = $null
+Import-Csv .\VersionReport.csv | ForEach-Object {
+  if ($_.'FileUrl.Compact') { $file = $_.'FileUrl.Compact' }
+  [pscustomobject]@{ File = $file; Size = [int64]$_.Size }
+} | Group-Object File | ForEach-Object {
+  [pscustomobject]@{
+    File     = $_.Name
+    Versions = $_.Count
+    SizeMB   = [math]::Round(($_.Group | Measure-Object Size -Sum).Sum / 1MB, 1)
+  }
+} | Sort-Object SizeMB -Descending | Select-Object -First 25</code></pre>
+
+<p>If the result shows versions are the problem, you can set limits for the site with <code>Set-SPOSite -Identity $site -EnableAutoExpirationVersionTrim $true</code> and then <a href="https://learn.microsoft.com/en-us/sharepoint/trim-versions">trim existing versions</a> with <code>New-SPOSiteFileVersionBatchDeleteJob</code>. Trimmed versions are deleted permanently and bypass the recycle bin, so run the what-if analysis on the report first.</p>
+
+<h2>Recycle bins count against the quota</h2>
+
+<p>Deleting files doesn't free space straight away. Deleted items go to the site recycle bin; when they are deleted from there they move to the site collection (second-stage) recycle bin, and they are removed for good <a href="https://support.microsoft.com/en-us/office/restore-items-in-the-recycle-bin-that-were-deleted-from-sharepoint-or-teams-6df466b6-55f2-4898-8d6e-c0dff851a0be">93 days after the original deletion</a>. Both stages use quota during that time. After a large cleanup it is worth checking how much is sitting in them:</p>
+
+<pre><code>$items = @(Get-PnPRecycleBinItem -FirstStage) + @(Get-PnPRecycleBinItem -SecondStage)
+$items | Group-Object ItemState | ForEach-Object {
+  [pscustomobject]@{
+    Stage  = $_.Name
+    Items  = $_.Count
+    SizeGB = [math]::Round(($_.Group | Measure-Object Size -Sum).Sum / 1GB, 2)
+  }
+}</code></pre>
+
+<p>Emptying the second stage is irreversible, so make sure nobody expects to restore those items first.</p>
+
+<h2>Why a full folder tree with sizes is hard to get</h2>
+
+<p>With all of the above you can see the total, the size of each site, each library, the largest current files, version weight per file and recycle bin contents. You still can't easily see the whole folder tree of a library, or of the tenant, with sizes at every level. Storage Metrics shows folders, but one site at a time, by clicking, and without export. The admin center reports stop at site level. Getting that view from PowerShell means walking every folder of every library, calling <code>Get-PnPFolderStorageMetric</code> for each one and storing the results somewhere so you can compare runs later. For a handful of sites a script is fine. Across a large tenant it turns into a crawler you have to maintain.</p>
+
+<p>This is where <a href="/storage-observer/">Storage Observer</a> fits. A daemon scans SharePoint document libraries and reports to a central server, which shows each folder's size split into direct contents and subtree totals, keeps a size history per folder across scans, and lists the file types that use the most space. It runs on your own infrastructure.</p>
+
+<p>A practical place to start: export the Active sites list sorted by Storage used, pick the three largest sites, and run the library script above against each of them. If one library's <code>TotalSize</code> stands out, queue a version storage report for that site today, since it will take a day or more to finish, and check the recycle bins while you wait.</p>
+      </div>
+
+      <aside class="card post-cta" aria-label="Storage Observer">
+        <p class="eyebrow">Storage Observer</p>
+        <h2>Where Storage Observer fits</h2>
+        <p>Storage Observer scans SharePoint document libraries alongside local disks, network shares, S3, Azure Files and Blob storage. For each folder it shows direct and subtree sizes and its size history across scans, and it runs on your own infrastructure.</p>
+        <a href="/storage-observer/" class="btn btn-primary">
+          See Storage Observer
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+      </aside>
+
+      <p class="post-footer-nav"><a href="/blog/">← Back to all posts</a></p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" class="footer-logo-link">
+        <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+      </a>
+      <p class="footer-tagline">Infrastructure tooling that fills the gaps. Self-hosted, production-grade.</p>
+    </div>
+    <div class="footer-columns">
+      <div>
+        <p class="footer-heading">Products</p>
+        <ul class="footer-links">
+          <li><a href="/azure-autoscaler/">Azure Autoscaler</a></li>
+          <li><a href="/storage-observer/">Storage Observer</a></li>
+          <li><a href="/traefik-precompiled/">Traefork</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-heading">Company</p>
+        <ul class="footer-links">
+          <li><a href="/consulting/">Consulting</a></li>
+          <li><a href="/support/">Support</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/consulting/#contact">Contact</a></li>
+          <li><a href="/traefik-precompiled/#licenses">Open Source Licenses</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Mutex Studio S.L. All rights reserved.</p>
+    <nav class="footer-legal" aria-label="Legal">
+      <a href="/aviso-legal/">Aviso legal</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/cookies/">Cookies</a>
+      <a href="#" data-cookie-settings>Cookie settings</a>
+    </nav>
+    <p>MUTEX STUDIO S.L. · NIF B05790308 · <a href="mailto:info@mutexstudio.com">info@mutexstudio.com</a></p>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js?v=4"></script>
+</body>
+</html>

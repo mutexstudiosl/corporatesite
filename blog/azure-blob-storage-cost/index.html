@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A breakdown of Azure Blob Storage cost by meter: capacity per tier, transactions, retrieval, early deletion, versions and snapshots, and how to see each one.">
+  <title>Azure Blob Storage cost: where the bill comes from — Mutex Studio</title>
+
+  <link rel="icon" href="/assets/img/favicons/icon.svg?v=5" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png?v=5">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png?v=5">
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/img/favicons/favicon.ico?v=5">
+  <link rel="manifest" href="/assets/img/favicons/site.webmanifest">
+  <link rel="stylesheet" href="/assets/css/site.css?v=20">
+  <link rel="canonical" href="https://www.mutexstudio.com/blog/azure-blob-storage-cost/">
+  <link rel="alternate" type="application/rss+xml" title="Mutex Studio blog" href="https://www.mutexstudio.com/blog/feed.xml">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Mutex Studio">
+  <meta property="og:title" content="Azure Blob Storage cost: where the bill comes from — Mutex Studio">
+  <meta property="og:description" content="A breakdown of Azure Blob Storage cost by meter: capacity per tier, transactions, retrieval, early deletion, versions and snapshots, and how to see each one.">
+  <meta property="og:url" content="https://www.mutexstudio.com/blog/azure-blob-storage-cost/">
+  <meta property="og:image" content="https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta property="article:published_time" content="2026-11-17">
+  <meta property="article:modified_time" content="2026-11-17">
+  <meta property="article:author" content="David García García">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Azure Blob Storage cost: where the bill comes from",
+  "description": "A breakdown of Azure Blob Storage cost by meter: capacity per tier, transactions, retrieval, early deletion, versions and snapshots, and how to see each one.",
+  "datePublished": "2026-11-17",
+  "dateModified": "2026-11-17",
+  "inLanguage": "en",
+  "wordCount": 1771,
+  "url": "https://www.mutexstudio.com/blog/azure-blob-storage-cost/",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.mutexstudio.com/blog/azure-blob-storage-cost/"
+  },
+  "image": "https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png",
+  "author": {
+    "@type": "Person",
+    "name": "David García García",
+    "url": "https://medium.com/@deividb"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Mutex Studio",
+    "url": "https://www.mutexstudio.com/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png"
+    }
+  }
+}
+  </script>
+</head>
+
+<body class="accent-violet page-blog">
+
+  <nav class="site-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+    </a>
+
+    <div class="nav-desktop">
+      <div class="nav-group">
+        <button type="button" class="nav-trigger" aria-haspopup="true">
+          Products
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="/azure-autoscaler/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--blue">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Azure Autoscaler</div>
+              <div class="nav-dropdown-desc">Smart resource scaling</div>
+            </div>
+          </a>
+          <a href="/storage-observer/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--violet">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Storage Observer</div>
+              <div class="nav-dropdown-desc">File storage at any scale</div>
+            </div>
+          </a>
+          <a href="/traefik-precompiled/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--emerald">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Traefork</div>
+              <div class="nav-dropdown-desc">Soft-fork, plugins compiled in</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <a href="/consulting/" class="nav-link nav-link-consulting">Consulting</a>
+      <a href="/support/" class="nav-link nav-link-support">Support</a>
+      <a href="/blog/" class="nav-link nav-link-blog">Blog</a>
+    </div>
+
+    <a href="/consulting/#contact" class="nav-cta">Talk to us</a>
+
+    <button type="button" id="mobile-menu-btn" class="nav-mobile-btn" aria-label="Open menu">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="nav-mobile">
+    <p class="nav-mobile-label">Products</p>
+    <a href="/azure-autoscaler/" class="nav-mobile-link">Azure Autoscaler</a>
+    <a href="/storage-observer/" class="nav-mobile-link">Storage Observer</a>
+    <a href="/traefik-precompiled/" class="nav-mobile-link">Traefork</a>
+    <div class="nav-mobile-divider"></div>
+    <a href="/consulting/" class="nav-mobile-link">Consulting</a>
+    <a href="/support/" class="nav-mobile-link">Support</a>
+    <a href="/blog/" class="nav-mobile-link">Blog</a>
+    <a href="/consulting/#contact" class="nav-mobile-cta">Talk to us</a>
+  </div>
+</nav>
+
+  <main class="post">
+    <article class="post-inner">
+      <a href="/blog/" class="hero-back">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        All posts
+      </a>
+      <header class="post-header">
+        <p class="eyebrow">Storage costs</p>
+        <h1>Azure Blob Storage cost: where the bill comes from</h1>
+        <p class="post-lead">A storage account bill is the sum of several meters, and the capacity line is only one of them. This post goes through each meter, where to see it in Azure, and how to find out which folders the money goes to.</p>
+        <p class="post-meta"><span>By David García García</span><span><time datetime="2026-11-17">17 November 2026</time></span><span>9 min read</span></p>
+      </header>
+
+      <div class="prose">
+<p>When an Azure Blob Storage cost line goes up, the first reaction is usually to look at how much data the account holds. That is often the right place to start, but capacity is only one of the meters on the invoice. Transactions, data retrieval from cooler tiers, early deletion charges, retained versions and snapshots, and geo-replication can each move the total, and some of them grow without anyone uploading new data. This post goes through what you are billed for, how to see each part in Cost Management and Azure Monitor, and how to get the breakdown by folder or prefix that the built-in tools do not give you.</p>
+
+<h2>The meters behind an Azure Blob Storage cost</h2>
+
+<p>Microsoft's <a href="https://learn.microsoft.com/en-us/azure/storage/common/storage-plan-manage-costs">cost planning article for Blob Storage</a> lists the meters. The ones most accounts see are data storage (per GB per month), operations (per transaction, usually priced per 10,000), data retrieval (per GB, only for the cool, cold and archive tiers) and data transfer (per GB). Others appear only when you enable a feature, such as blob index tags, SFTP (charged per hour while enabled) or blob inventory.</p>
+
+<p>Unit prices depend on region, redundancy, access tier and namespace type, and they change over time, so we do not quote them here. Use the <a href="https://azure.microsoft.com/en-us/pricing/details/storage/blobs/">Block blob pricing page</a> with the filters set to match your account. When you check the maths, note that the "GB" on the bill is a binary gigabyte (GiB), and capacity is billed on the average daily amount stored over the month.</p>
+
+<h3>Capacity per access tier</h3>
+
+<p>Block blobs live in one of four <a href="https://learn.microsoft.com/en-us/azure/storage/blobs/access-tiers-overview">access tiers</a>. The per-GB capacity price falls as the tier gets cooler, while the cost of reading and the per-transaction price rise. On general-purpose v2 accounts the cooler tiers also have a minimum retention period:</p>
+
+<table>
+  <thead>
+    <tr><th>Tier</th><th>Minimum retention</th><th>Time to first byte</th><th>Reads</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Hot</td><td>None</td><td>Milliseconds</td><td>No per-GB retrieval charge</td></tr>
+    <tr><td>Cool</td><td>30 days</td><td>Milliseconds</td><td>Per-GB retrieval charge</td></tr>
+    <tr><td>Cold</td><td>90 days</td><td>Milliseconds</td><td>Per-GB retrieval charge</td></tr>
+    <tr><td>Archive</td><td>180 days</td><td>Hours (rehydration first)</td><td>Highest retrieval cost</td></tr>
+  </tbody>
+</table>
+
+<p>Archive is offline. To read a blob you rehydrate it to an online tier, which can take up to 15 hours depending on the priority you choose, and high-priority rehydration costs more. Archive is only available on LRS, GRS and RA-GRS accounts. There is also a smart tier that moves data between hot, cool and cold for a monitoring fee, without tier transition or early deletion charges.</p>
+
+<p>Be careful with the account's default access tier. Blobs uploaded without an explicit tier inherit it, so changing the default from hot to cool charges a write operation for every such blob, and changing it back charges a read operation plus data retrieval for each.</p>
+
+<h3>Transactions and data retrieval</h3>
+
+<p>The pricing page lists prices per operation type (write, read, list and create container, other), usually per 10,000 operations. Microsoft has a table that <a href="https://learn.microsoft.com/en-us/azure/storage/blobs/map-rest-apis-transaction-categories">maps each REST operation to its type</a>; Delete Blob, for example, is free on general-purpose v2. Transactions cost more in cooler tiers, and reads from cool, cold and archive also pay per GB retrieved. A workload that writes many small objects, or a backup job that reads the cool tier every week, can pay more for operations and retrieval than for capacity.</p>
+
+<h3>Early deletion</h3>
+
+<p>If a blob in cool, cold or archive is deleted, overwritten or moved to another tier before its minimum period, you pay the remaining days. Microsoft's example: a blob moved to cool and deleted after 21 days is charged an extra 9 days of cool storage. Overwriting the whole object with Put Blob, Put Block List or Copy Blob counts as an early deletion too, which catches tools that rewrite files in place. With soft delete enabled, the penalty only applies once the retention period ends.</p>
+
+<h3>Versions, snapshots and soft delete</h3>
+
+<p>Versions and snapshots are billed at the same rate as live data, and so are soft-deleted objects until their retention ends. As long as nobody sets a tier explicitly, you pay for unique blocks across the base blob and its versions and snapshots. Once you set the tier of a blob, version or snapshot, you pay for the full content length of that object, and for the full length of the oldest version left in the original tier (see the <a href="https://learn.microsoft.com/en-us/azure/storage/blobs/versioning-overview">versioning billing rules</a>). This is why tiering a heavily versioned container can make capacity go up rather than down.</p>
+
+<p>Soft delete has a quieter effect. On an account without versioning, every overwrite creates a soft-deleted snapshot of the previous state, and <a href="https://learn.microsoft.com/en-us/azure/storage/blobs/soft-delete-blob-overview">that snapshot creation is not logged</a>. A job that rewrites the same checkpoint file every few minutes, on an account with a long retention period (up to 365 days), builds up billable data that is easy to miss. With versioning on, overwrites create previous versions instead, and those stay until something deletes them.</p>
+
+<h3>Redundancy and data transfer</h3>
+
+<p>The capacity price depends on the redundancy option. Geo-redundant accounts (GRS, RA-GRS, GZRS) also pay a per-GB geo-replication data transfer charge. Data leaving the Azure region is billed as bandwidth, which is priced on the separate bandwidth pricing page, not the storage one. Object replication to another region counts as well.</p>
+
+<h2>Reading the bill in Cost Management</h2>
+
+<p>In <a href="https://learn.microsoft.com/en-us/azure/cost-management-billing/costs/quick-acm-cost-analysis">Cost analysis</a>, open the Resources smart view at the subscription or resource group scope and expand the storage account row. The next level shows the account's cost by product meter, which is the Azure storage cost breakdown you want: capacity per tier, each operation type, retrieval and transfer as separate lines. In a customizable view, filter to the storage account and group by a more detailed attribute (Cost analysis groups by one attribute at a time), with granularity set to Daily so you can see the day a meter changed. For deeper analysis, the planning article recommends a scheduled cost export.</p>
+
+<h2>Capacity metrics in Azure Monitor</h2>
+
+<p>Where Cost Management shows money, Azure Monitor shows how much data sits in each tier. The <a href="https://learn.microsoft.com/en-us/azure/storage/blobs/monitor-blob-storage-reference">Blob Storage metrics</a> include <code>BlobCapacity</code> and <code>BlobCount</code> with <code>Tier</code> and <code>BlobType</code> dimensions. They are emitted hourly but recomputed only a few times a day, so do not expect them to react to an upload straight away. This lists capacity per tier for the last two days:</p>
+
+<pre><code>az monitor metrics list \
+  --resource "/subscriptions/&lt;sub-id&gt;/resourceGroups/&lt;rg&gt;/providers/Microsoft.Storage/storageAccounts/&lt;account&gt;/blobServices/default" \
+  --metrics BlobCapacity \
+  --dimension Tier \
+  --aggregation Average \
+  --interval PT1H \
+  --offset 2d \
+  --output table</code></pre>
+
+<p>There are also container-level metrics (<code>ContainerUsedSize</code> and <code>ContainerBlobCount</code>), listed as advanced platform metrics on the same page. Two limits apply. <code>BlobCapacity</code> does not separate soft-deleted data from active data, and nothing in Azure Monitor goes below the container.</p>
+
+<h2>Blob inventory reports</h2>
+
+<p><a href="https://learn.microsoft.com/en-us/azure/storage/blobs/blob-inventory">Blob inventory</a> produces a daily or weekly CSV or Parquet file listing every blob, and optionally every version, snapshot and soft-deleted object, with the properties you choose. This is the raw material for an Azure Blob Storage cost analysis at the object level. A rule that captures what you need for cost work looks like this:</p>
+
+<pre><code>{
+  "enabled": true,
+  "rules": [
+    {
+      "enabled": true,
+      "name": "cost-weekly",
+      "destination": "inventory",
+      "definition": {
+        "filters": {
+          "blobTypes": ["blockBlob", "appendBlob"],
+          "includeSnapshots": true,
+          "includeBlobVersions": true,
+          "includeDeleted": true
+        },
+        "format": "csv",
+        "objectType": "blob",
+        "schedule": "weekly",
+        "schemaFields": [
+          "Name", "Content-Length", "AccessTier", "Last-Modified",
+          "Snapshot", "VersionId", "IsCurrentVersion",
+          "Deleted", "RemainingRetentionDays"
+        ]
+      }
+    }
+  ]
+}</code></pre>
+
+<p>The <code>Snapshot</code>, <code>VersionId</code> and <code>IsCurrentVersion</code> fields are required when you include snapshots and versions. Versioning fields are not available on accounts with a hierarchical namespace, so remove them there. The destination container has to exist first. Apply the rule with the Azure CLI (the command group is still marked preview):</p>
+
+<pre><code>az storage account blob-inventory-policy create \
+  -g &lt;rg&gt; --account-name &lt;account&gt; --policy @inventory-policy.json</code></pre>
+
+<p>Inventory is billed per million objects scanned. Snapshots and versions count towards that even if you filter them out of the report. The files themselves are also stored and read at normal rates.</p>
+
+<h2>Why the folder breakdown is usually missing</h2>
+
+<p>Everything above stops at the account or the container. In practice the question is narrower: which application, customer or folder holds the data, and how much of it is old versions or soft-deleted copies. Blob Storage has no folder-level metric, and Cost Management has no idea what your prefixes mean.</p>
+
+<p>Microsoft's own <a href="https://learn.microsoft.com/en-us/azure/storage/blobs/calculate-blob-count-size">example query</a> uses Synapse serverless SQL to sum an inventory file per container. Extending it one level down, to container plus first folder, gives a per-prefix view split by tier:</p>
+
+<pre><code>SELECT
+    LEFT([Name], CHARINDEX('/', [Name] + '/', CHARINDEX('/', [Name]) + 1) - 1) AS Prefix,
+    [AccessTier],
+    COUNT(*) AS Objects,
+    SUM([Content-Length]) / POWER(1024.0, 3) AS GiB
+FROM OPENROWSET(
+    BULK '&lt;URL to your inventory CSV file&gt;',
+    FORMAT = 'CSV', PARSER_VERSION = '2.0', HEADER_ROW = TRUE
+) AS Source
+GROUP BY
+    LEFT([Name], CHARINDEX('/', [Name] + '/', CHARINDEX('/', [Name]) + 1) - 1),
+    [AccessTier]
+ORDER BY GiB DESC;</code></pre>
+
+<p>To turn that into money, multiply each row by the capacity price for its tier: <code>monthly_cost(prefix) ≈ Σ GiB(prefix, tier) × capacity_price(tier)</code>, with the prices taken from the pricing page for your region and redundancy. Group by the <code>Snapshot</code>, <code>VersionId</code> and <code>Deleted</code> columns too if you want to see how much of each prefix is history rather than live data. Treat the result as an estimate: Content-Length counts the full size of every version, while untiered versions are billed by unique blocks, and Microsoft says inventory totals should not be compared directly with billed capacity. It is good enough to rank prefixes. Large inventories are split into several files listed in the manifest, so query all of them.</p>
+
+<p>If you would rather not maintain that pipeline, <a href="/storage-observer/">Storage Observer</a> scans Azure Blob and ADLS from a daemon that runs next to the storage, and shows which folders use the space, what they cost and how they have grown over time.</p>
+
+<h2>Azure Blob Storage lifecycle management policies</h2>
+
+<p>Once you know where the data is, <a href="https://learn.microsoft.com/en-us/azure/storage/blobs/lifecycle-management-overview">lifecycle management</a> handles most of the clean-up. A policy is a JSON document of up to 100 rules. Each rule filters by blob type, by prefix (up to 10, each starting with the container name) or by index tags, and acts on the current version (<code>baseBlob</code>), previous versions (<code>version</code>) or snapshots (<code>snapshot</code>). This example tiers log data down over a year and removes old versions and snapshots across the account:</p>
+
+<pre><code>{
+  "rules": [
+    {
+      "name": "logs-tiering",
+      "enabled": true,
+      "type": "Lifecycle",
+      "definition": {
+        "filters": {
+          "blobTypes": ["blockBlob"],
+          "prefixMatch": ["app-logs/"]
+        },
+        "actions": {
+          "baseBlob": {
+            "tierToCool": { "daysAfterModificationGreaterThan": 30 },
+            "tierToCold": { "daysAfterModificationGreaterThan": 90 },
+            "delete": { "daysAfterModificationGreaterThan": 365 }
+          }
+        }
+      }
+    },
+    {
+      "name": "prune-history",
+      "enabled": true,
+      "type": "Lifecycle",
+      "definition": {
+        "filters": { "blobTypes": ["blockBlob"] },
+        "actions": {
+          "version": { "delete": { "daysAfterCreationGreaterThan": 90 } },
+          "snapshot": { "delete": { "daysAfterCreationGreaterThan": 90 } }
+        }
+      }
+    }
+  ]
+}</code></pre>
+
+<p>The thresholds are spaced so each step comes after the previous tier's minimum: a blob reaches cold 60 days after it went to cool, and is deleted 275 days after it went to cold, so no early deletion charge applies. Apply it with:</p>
+
+<pre><code>az storage account management-policy create \
+  --account-name &lt;account&gt; --resource-group &lt;rg&gt; --policy @policy.json</code></pre>
+
+<p>A few points from the <a href="https://learn.microsoft.com/en-us/azure/storage/blobs/lifecycle-management-policy-structure">policy reference</a> affect cost. The policy is free, but each tier change is billed as a Set Blob Tier operation. A version's age counts from when its data was first written, not from when it became a previous version. The policy will not delete a current version that still has versions or snapshots, which is one reason for the second rule. With soft delete on, lifecycle deletes become soft-deleted and keep billing until retention ends. Changes can take up to 24 hours to apply. Rules that use <code>daysAfterLastAccessTimeGreaterThan</code> need access time tracking, and each last-access update is billed as an "other" operation, at most once per object per day.</p>
+
+<p>A practical next step: enable a weekly inventory rule on your largest storage account today, run the prefix query against the first report, and compare the top ten prefixes with what you expected. That list, together with the meter breakdown in Cost analysis, usually shows which lifecycle rule to write first.</p>
+      </div>
+
+      <aside class="card post-cta" aria-label="Storage Observer">
+        <p class="eyebrow">Storage Observer</p>
+        <h2>Where Storage Observer fits</h2>
+        <p>Storage Observer scans Azure Blob and ADLS, along with Azure Files, S3, SharePoint and local or network shares, and shows folder sizes, size history, and monthly storage and snapshot cost for each scan root. It is self-hosted and sends no telemetry.</p>
+        <a href="/storage-observer/" class="btn btn-primary">
+          See Storage Observer
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+      </aside>
+
+      <p class="post-footer-nav"><a href="/blog/">← Back to all posts</a></p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" class="footer-logo-link">
+        <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+      </a>
+      <p class="footer-tagline">Infrastructure tooling that fills the gaps. Self-hosted, production-grade.</p>
+    </div>
+    <div class="footer-columns">
+      <div>
+        <p class="footer-heading">Products</p>
+        <ul class="footer-links">
+          <li><a href="/azure-autoscaler/">Azure Autoscaler</a></li>
+          <li><a href="/storage-observer/">Storage Observer</a></li>
+          <li><a href="/traefik-precompiled/">Traefork</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-heading">Company</p>
+        <ul class="footer-links">
+          <li><a href="/consulting/">Consulting</a></li>
+          <li><a href="/support/">Support</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/consulting/#contact">Contact</a></li>
+          <li><a href="/traefik-precompiled/#licenses">Open Source Licenses</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Mutex Studio S.L. All rights reserved.</p>
+    <nav class="footer-legal" aria-label="Legal">
+      <a href="/aviso-legal/">Aviso legal</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/cookies/">Cookies</a>
+      <a href="#" data-cookie-settings>Cookie settings</a>
+    </nav>
+    <p>MUTEX STUDIO S.L. · NIF B05790308 · <a href="mailto:info@mutexstudio.com">info@mutexstudio.com</a></p>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js?v=4"></script>
+</body>
+</html>

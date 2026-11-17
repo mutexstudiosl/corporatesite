@@ -6,7 +6,47 @@
     <atom:link href="https://www.mutexstudio.com/blog/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Practical articles on Azure cost and autoscaling, Kubernetes ingress with Traefik, and file storage usage.</description>
     <language>en</language>
-    <lastBuildDate>Tue, 17 Nov 2026 04:37:36 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 17 Nov 2026 05:14:30 +0000</lastBuildDate>
+    <item>
+      <title>Traefik CrowdSec on Kubernetes: bouncer plugin and AppSec</title>
+      <link>https://www.mutexstudio.com/blog/traefik-crowdsec-kubernetes/</link>
+      <guid isPermaLink="true">https://www.mutexstudio.com/blog/traefik-crowdsec-kubernetes/</guid>
+      <pubDate>Tue, 17 Nov 2026 08:00:00 +0000</pubDate>
+      <dc:creator>David García García</dc:creator>
+      <description>How to run CrowdSec with Traefik on Kubernetes: Helm install, Traefik access log parsing, the bouncer plugin as a Middleware, AppSec and real client IPs on AKS.</description>
+    </item>
+    <item>
+      <title>SharePoint storage usage: find what fills your tenant quota</title>
+      <link>https://www.mutexstudio.com/blog/sharepoint-storage-usage/</link>
+      <guid isPermaLink="true">https://www.mutexstudio.com/blog/sharepoint-storage-usage/</guid>
+      <pubDate>Tue, 17 Nov 2026 08:00:00 +0000</pubDate>
+      <dc:creator>David García García</dc:creator>
+      <description>How SharePoint storage usage is counted, which built-in reports to check, and PnP PowerShell scripts to find large sites, libraries, versions and recycle bins.</description>
+    </item>
+    <item>
+      <title>Azure SQL serverless vs provisioned: working out which costs less</title>
+      <link>https://www.mutexstudio.com/blog/azure-sql-serverless-vs-provisioned/</link>
+      <guid isPermaLink="true">https://www.mutexstudio.com/blog/azure-sql-serverless-vs-provisioned/</guid>
+      <pubDate>Tue, 17 Nov 2026 08:00:00 +0000</pubDate>
+      <dc:creator>David García García</dc:creator>
+      <description>How Azure SQL serverless and provisioned compute are billed, how to work out the break-even for a database, and where scheduled scaling or elastic pools fit.</description>
+    </item>
+    <item>
+      <title>Azure SQL scaling downtime: what happens and how to retry</title>
+      <link>https://www.mutexstudio.com/blog/azure-sql-scaling-downtime/</link>
+      <guid isPermaLink="true">https://www.mutexstudio.com/blog/azure-sql-scaling-downtime/</guid>
+      <pubDate>Tue, 17 Nov 2026 08:00:00 +0000</pubDate>
+      <dc:creator>David García García</dc:creator>
+      <description>What happens inside an Azure SQL Database scale operation, how long it takes, which errors your code should retry, and how to scale and monitor it safely.</description>
+    </item>
+    <item>
+      <title>Azure Blob Storage cost: where the bill comes from</title>
+      <link>https://www.mutexstudio.com/blog/azure-blob-storage-cost/</link>
+      <guid isPermaLink="true">https://www.mutexstudio.com/blog/azure-blob-storage-cost/</guid>
+      <pubDate>Tue, 17 Nov 2026 08:00:00 +0000</pubDate>
+      <dc:creator>David García García</dc:creator>
+      <description>A breakdown of Azure Blob Storage cost by meter: capacity per tier, transactions, retrieval, early deletion, versions and snapshots, and how to see each one.</description>
+    </item>
     <item>
       <title>Ingress-NGINX retirement on AKS: your migration options</title>
       <link>https://www.mutexstudio.com/blog/ingress-nginx-retirement-aks/</link>
