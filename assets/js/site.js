@@ -1,5 +1,5 @@
 (function () {
-  var GA_ID = 'G-R9QSEZ3HMM';
+  var GA_ID = 'G-H1T88WCYLH';
   var KEY = 'ms_cookie_consent';
 
   document.addEventListener('click', function (event) {
