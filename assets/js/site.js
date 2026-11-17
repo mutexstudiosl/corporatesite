@@ -21,17 +21,30 @@
     try { localStorage.setItem(KEY, value); } catch (e) {}
   }
 
-  function loadAnalytics() {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { window.dataLayer.push(arguments); };
+
+  // Google Consent Mode v2: measure from the first visit without cookies;
+  // analytics cookies are only set after the visitor accepts.
+  function initAnalytics(granted) {
     if (window.__gaLoaded) return;
     window.__gaLoaded = true;
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag('consent', 'default', {
+      analytics_storage: granted ? 'granted' : 'denied',
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied'
+    });
     window.gtag('js', new Date());
     window.gtag('config', GA_ID, { anonymize_ip: true });
     var s = document.createElement('script');
     s.async = true;
     s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
     document.head.appendChild(s);
+  }
+
+  function updateConsent(granted) {
+    window.gtag('consent', 'update', { analytics_storage: granted ? 'granted' : 'denied' });
   }
 
   function removeAnalyticsCookies() {
@@ -57,8 +70,8 @@
     banner.setAttribute('aria-label', 'Cookie preferences');
     banner.innerHTML =
       '<div class="cookie-banner-inner">' +
-        '<p>We use Google Analytics cookies to understand how the site is used, only if you accept. ' +
-        'Without your consent we set no analytics cookies. ' +
+        '<p>We use Google Analytics to understand how the site is used. ' +
+        'Without your consent it sets no cookies and sends only anonymous, cookieless measurements. ' +
         '<a href="/cookies/">Cookie policy</a> · <a href="/privacy/">Privacy</a></p>' +
         '<div class="cookie-actions">' +
           '<button type="button" class="btn btn-secondary cookie-reject">Reject</button>' +
@@ -68,17 +81,18 @@
     document.body.appendChild(banner);
     banner.querySelector('.cookie-accept').addEventListener('click', function () {
       setConsent('granted');
-      loadAnalytics();
+      updateConsent(true);
       banner.remove();
     });
     banner.querySelector('.cookie-reject').addEventListener('click', function () {
       setConsent('denied');
+      updateConsent(false);
       removeAnalyticsCookies();
       banner.remove();
     });
   }
 
   var consent = getConsent();
-  if (consent === 'granted') loadAnalytics();
-  else if (consent !== 'denied') showBanner();
+  initAnalytics(consent === 'granted');
+  if (consent !== 'granted' && consent !== 'denied') showBanner();
 })();
