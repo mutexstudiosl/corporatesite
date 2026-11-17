@@ -6,14 +6,14 @@
     <atom:link href="https://www.mutexstudio.com/blog/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Practical articles on Azure cost and autoscaling, Kubernetes ingress with Traefik, and file storage usage.</description>
     <language>en</language>
-    <lastBuildDate>Mon, 16 Nov 2026 19:17:42 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 17 Nov 2026 04:37:36 +0000</lastBuildDate>
     <item>
       <title>Ingress-NGINX retirement on AKS: your migration options</title>
       <link>https://www.mutexstudio.com/blog/ingress-nginx-retirement-aks/</link>
       <guid isPermaLink="true">https://www.mutexstudio.com/blog/ingress-nginx-retirement-aks/</guid>
       <pubDate>Mon, 16 Nov 2026 08:00:00 +0000</pubDate>
       <dc:creator>David García García</dc:creator>
-      <description>What the ingress-nginx retirement means on AKS, how to inventory what you use, and how to compare Gateway API, Application Gateway for Containers and Traefik.</description>
+      <description>What the ingress-nginx retirement means on AKS, how to inventory what you use, and why we move to Traefik rather than Application Gateway for Containers.</description>
     </item>
   </channel>
 </rss>

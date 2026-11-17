@@ -1,15 +1,16 @@
 <!--
 {
   "title": "Ingress-NGINX retirement on AKS: your migration options",
-  "description": "What the ingress-nginx retirement means on AKS, how to inventory what you use, and how to compare Gateway API, Application Gateway for Containers and Traefik.",
+  "description": "What the ingress-nginx retirement means on AKS, how to inventory what you use, and why we move to Traefik rather than Application Gateway for Containers.",
   "date": "2026-11-16",
+  "updated": "2026-11-17",
   "product": "traefork",
   "eyebrow": "Kubernetes ingress",
-  "lead": "Upstream ingress-nginx stopped receiving fixes in March 2026, and Microsoft's patches for the AKS application routing add-on run through November 2026. This is how we would plan the move off it.",
+  "lead": "Upstream ingress-nginx stopped receiving fixes in March 2026, and Microsoft's patches for the AKS application routing add-on run through November 2026. This is how we plan the move off it, and why Traefik is where we usually land.",
   "cta": "If you settle on Traefik and need WAF, CrowdSec or geoblocking middleware, Traefork is a Traefik build with those plugins compiled in rather than interpreted. It tracks upstream releases, so your configuration stays the same."
 }
 -->
-<p>If you run AKS clusters, the ingress-nginx retirement probably affects you in one of two ways. Either you installed the community controller yourself with Helm, or you enabled the application routing add-on, which runs a managed NGINX ingress controller. The ingress-nginx retirement on AKS has different deadlines for those two cases, but the work involved is mostly the same: find out what your Ingress objects depend on, pick a replacement, and move traffic without an outage.</p>
+<p>If you run AKS clusters, the ingress-nginx retirement probably affects you in one of two ways. Either you installed the community controller yourself with Helm, or you enabled the application routing add-on, which runs a managed NGINX ingress controller. The ingress-nginx retirement on AKS has different deadlines for those two cases, but the work involved is mostly the same: find out what your Ingress objects depend on, pick a replacement, and move traffic without an outage. For most clusters we pick Traefik, and this post explains why, along with the alternatives.</p>
 
 <h2>What was retired and what November 2026 means on AKS</h2>
 
@@ -52,24 +53,11 @@ kubectl get nginxingresscontrollers -o custom-columns=NAME:.metadata.name,CLASS:
 
 <p>Snippets (<code>configuration-snippet</code>, <code>server-snippet</code> and friends) are the hard part. They inject raw NGINX directives, and no other proxy can translate arbitrary NGINX configuration (the Kubernetes announcement also names them as a serious security flaw). Plan to read each snippet, work out what it was meant to do, and rebuild that intent on the new controller. Also look at the controller-wide ConfigMap (for a Helm install with the default release name it is <code>ingress-nginx-controller</code> in the <code>ingress-nginx</code> namespace), since global settings there change behaviour for every Ingress.</p>
 
-<h2>The options on AKS</h2>
+<h2>The options after the ingress-nginx retirement on AKS</h2>
 
-<h3>AKS application routing with Gateway API</h3>
+<h3>Traefik (our recommendation for most clusters)</h3>
 
-<p>This is the successor Microsoft points to. The <a href="https://learn.microsoft.com/en-us/azure/aks/app-routing-gateway-api">application routing Gateway API implementation</a> deploys a lightweight Istio control plane that only reconciles Gateway API resources for the <code>approuting-istio</code> GatewayClass. It does not support sidecar injection or Istio CRDs. Each <code>Gateway</code> gets its own Envoy deployment, Service, HorizontalPodAutoscaler and PodDisruptionBudget, and the control plane is upgraded in place with the cluster. You enable it with the managed Gateway API CRDs (Azure CLI 2.86.0 or later):</p>
-
-<pre><code>az aks update --resource-group $RG --name $CLUSTER --enable-gateway-api --enable-app-routing-istio
-kubectl get gatewayclass approuting-istio</code></pre>
-
-<p>It fits well if your Ingress objects are mostly host and path routing with TLS. Check the limitations first: you cannot configure request header and body size limits, Lua scripts, or local and global rate limiting, and <code>EnvoyFilter</code> is not supported. It also cannot run at the same time as the Istio service mesh add-on. If you need those features, Microsoft suggests Gateway API ingress with the Istio service mesh add-on, which allows a gateway-scoped <code>EnvoyFilter</code>; the trade-off is that <code>EnvoyFilter</code> issues are outside Azure support and you have to run canary upgrades for minor Istio versions yourself.</p>
-
-<h3>Application Gateway for Containers</h3>
-
-<p><a href="https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/overview">Application Gateway for Containers</a> keeps the data plane outside the cluster. An ALB Controller in the cluster watches Ingress, Gateway and HTTPRoute resources and configures the Azure-managed gateway. It supports both the Ingress API and Gateway API, WAF policies, mTLS and URL rewrites, which makes it a good match when you want WAF without running it yourself. Things to watch: Gateway listeners only allow ports 80 and 443, the service is available in a specific list of regions, it uses frontends with an FQDN rather than a static IP, and it is billed as a separate Azure resource.</p>
-
-<h3>Traefik</h3>
-
-<p>Traefik v3.6.2 and later includes a <a href="https://doc.traefik.io/traefik/v3.7/reference/install-configuration/providers/kubernetes/kubernetes-ingress-nginx/">Kubernetes Ingress NGINX provider</a>. It reads your existing Ingress objects (by default those whose IngressClass has the controller <code>k8s.io/ingress-nginx</code>) and translates many <code>nginx.ingress.kubernetes.io</code> annotations, including auth, CORS, canary, rate limiting, timeouts, buffering and a limited set of directives inside <code>configuration-snippet</code> and <code>server-snippet</code>. That means you can install Traefik next to ingress-nginx, point it at the same objects and test it without rewriting manifests. Later you can move to Gateway API, which Traefik also implements, at your own pace. With the Helm chart, enabling the provider looks like this:</p>
+<p>We run Traefik on production AKS clusters, and it is the replacement we reach for first. The main reason is that it meets you where your manifests already are. Traefik v3.6.2 and later includes a <a href="https://doc.traefik.io/traefik/v3.7/reference/install-configuration/providers/kubernetes/kubernetes-ingress-nginx/">Kubernetes Ingress NGINX provider</a>. It reads your existing Ingress objects (by default those whose IngressClass has the controller <code>k8s.io/ingress-nginx</code>) and translates many <code>nginx.ingress.kubernetes.io</code> annotations, including auth, CORS, canary, rate limiting, timeouts, buffering and a limited set of directives inside <code>configuration-snippet</code> and <code>server-snippet</code>. You can install Traefik next to ingress-nginx, point it at the same objects and test it without rewriting manifests. With the Helm chart, enabling the provider looks like this:</p>
 
 <pre><code>helm repo add traefik https://traefik.github.io/charts
 helm repo update
@@ -77,11 +65,44 @@ helm upgrade --install traefik traefik/traefik \
   --namespace traefik --create-namespace \
   --set providers.kubernetesIngressNGINX.enabled=true</code></pre>
 
-<p>The trade-off is that you operate it yourself, and it is not a Microsoft-supported component. The provider has documented differences too: only round-robin load balancing, only persistent session affinity, forward auth without session caching, and rate limiting that returns 429 rather than 503. The reference also has a long table of unsupported annotations, among them <code>enable-modsecurity</code>, <code>global-rate-limit</code> and <code>mirror-target</code>. Compare your annotation count from the inventory against that table.</p>
+<p>Once traffic has moved, you are not stuck with nginx annotations. The same Traefik deployment also implements the standard Ingress API, Gateway API, and its own CRDs (IngressRoute and Middleware), so you can move route by route at your own pace. Middleware objects cover things Gateway API has no standard field for, such as rate limiting, IP allow lists, forward auth and header manipulation, and when the built-in set is not enough there is a plugin mechanism for custom middleware.</p>
+
+<p>Traefik runs inside the cluster and watches Ingress, Gateway API and its own CRDs through the Kubernetes API, then rebuilds its routing table in-process. There is no external service to program in between. In our experience a changed Ingress, HTTPRoute or Middleware is live on Traefik faster than the same change on Application Gateway for Containers, which has to go through Azure (more on that below).</p>
+
+<p>It also fits the rest of the Kubernetes tooling you probably already run. TLS certificates are ordinary <code>kubernetes.io/tls</code> Secrets referenced from <code>spec.tls</code> or a Gateway listener, so cert-manager works the normal way, either with ingress annotations or with its Gateway API support. ExternalDNS can read the published addresses from Ingress status or Gateway resources, and because the configuration is plain Kubernetes objects, GitOps tools manage it like anything else in the cluster. The Service in front of Traefik is a regular Azure Load Balancer, so you keep a static public IP if your firewall rules or upstream services need one.</p>
+
+<p>The trade-off is that you operate it yourself, and it is not a Microsoft-supported component. Upgrades, scaling and monitoring are your job. The provider also has documented differences from ingress-nginx: only round-robin load balancing, only persistent session affinity, forward auth without session caching, and rate limiting that returns 429 rather than 503. The reference has a long table of unsupported annotations, among them <code>enable-modsecurity</code>, <code>global-rate-limit</code> and <code>mirror-target</code>. Compare your annotation count from the inventory against that table before you commit.</p>
+
+<h3>AKS application routing with Gateway API</h3>
+
+<p>This is the successor Microsoft points to, and it is a reasonable choice if your Ingress objects are plain host and path routing with TLS and you want AKS to manage the controller. The <a href="https://learn.microsoft.com/en-us/azure/aks/app-routing-gateway-api">application routing Gateway API implementation</a> deploys a lightweight Istio control plane that only reconciles Gateway API resources for the <code>approuting-istio</code> GatewayClass. It does not support sidecar injection or Istio CRDs. Each <code>Gateway</code> gets its own Envoy deployment, Service, HorizontalPodAutoscaler and PodDisruptionBudget, and the control plane is upgraded in place with the cluster. You enable it with the managed Gateway API CRDs (Azure CLI 2.86.0 or later):</p>
+
+<pre><code>az aks update --resource-group $RG --name $CLUSTER --enable-gateway-api --enable-app-routing-istio
+kubectl get gatewayclass approuting-istio</code></pre>
+
+<p>Check the limitations first: you cannot configure request header and body size limits, Lua scripts, or local and global rate limiting, and <code>EnvoyFilter</code> is not supported. It also cannot run at the same time as the Istio service mesh add-on. If you need those features, Microsoft suggests Gateway API ingress with the Istio service mesh add-on, which allows a gateway-scoped <code>EnvoyFilter</code>; the trade-off is that <code>EnvoyFilter</code> issues are outside Azure support and you have to run canary upgrades for minor Istio versions yourself. There is no translation layer for nginx annotations either, so every Ingress has to be rewritten as Gateway API resources before it can move.</p>
+
+<h3>Application Gateway for Containers</h3>
+
+<p><a href="https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/overview">Application Gateway for Containers</a> is Microsoft's managed layer 7 load balancer for AKS. Azure operates the data plane outside the cluster. An ALB Controller inside the cluster watches Ingress, Gateway, HTTPRoute and its own custom resources, and applies that configuration to the gateway in Azure. It supports the Ingress API and Gateway API, WAF policies, mTLS, header and URL rewrites, JWT validation, traffic splitting and several load balancing algorithms. Gateway listeners only allow ports 80 and 443, the service is available in a specific list of regions, and each frontend is reached through an Azure-generated FQDN that you point a CNAME at rather than a static IP. Each deployment also needs a delegated subnet; Microsoft's <a href="https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/application-gateway-for-containers-components">components page</a> asks for at least a /24 per association.</p>
+
+<p>We have run it in production, and for most clusters we would not choose it again. These are the reasons.</p>
+
+<p><strong>It ties your ingress to Azure.</strong> The data plane is an Azure resource, not a controller you can deploy elsewhere. Your HTTPRoutes may be standard Gateway API, but the GatewayClass, the <code>alb.networking.azure.io</code> annotations, the ApplicationLoadBalancer resource, frontends, associations and security policies are all Azure-specific. If a workload later moves off AKS, you replace the ingress layer rather than take it with you. Traefik runs the same way on any Kubernetes cluster.</p>
+
+<p><strong>Configuration changes take a longer path.</strong> The <a href="https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/application-gateway-for-containers-components">components page</a> describes how the ALB Controller "uses both ARM and Application Gateway for Containers configuration APIs to propagate configuration" to the Azure deployment, and it needs outbound access to Azure Resource Manager, Entra ID and the configuration endpoint to do it. A route is only live when its status reports that the Application Gateway for Containers resource has been updated and the condition is <code>Programmed</code>. Microsoft does not publish a propagation time. Architecturally it is a remote call to a managed service, where Traefik applies the change in the same process that serves traffic, and in our experience Traefik picks up Ingress, Gateway and Middleware changes noticeably faster. When something goes wrong in that chain, such as a missing role assignment or federated credential, the <a href="https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/troubleshooting-guide">troubleshooting guide</a> shows the symptom as routes that simply stop being applied while the controller retries.</p>
+
+<p><strong>It is another Azure bill and another set of resources.</strong> Application Gateway for Containers is billed as its own Azure resource on top of the cluster, and WAF adds to that. Microsoft lists it on the <a href="https://azure.microsoft.com/pricing/details/application-gateway/">Application Gateway pricing page</a>. You also need a managed identity with the AppGw for Containers Configuration Manager role and the delegated subnet mentioned above. Traefik runs on nodes you already pay for, behind the standard load balancer AKS already creates.</p>
+
+<p><strong>The feature set is fixed.</strong> What Application Gateway for Containers can do is the list in Microsoft's overview: routing on host, path, header, query string and method, rewrites and redirects, retries, health probes, mTLS, JWT validation, WAF and so on. That list is decent, but if you need something outside it you wait for Azure to add it. There is no equivalent of Traefik's Middleware chain or plugin mechanism, and snippet-style customisation from ingress-nginx has nowhere to go.</p>
+
+<p><strong>Certificates must live in the cluster, and Key Vault mounting is not supported.</strong> To be fair here: cert-manager does work. Microsoft documents <a href="https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/how-to-cert-manager-lets-encrypt-gateway-api">cert-manager with Let's Encrypt on Gateway API</a>, and the <a href="https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/how-to-ssl-offloading-gateway-api">SSL offloading guide</a> states that certificates must be stored as Kubernetes secrets. The same note says Azure Key Vault integration through the Secrets Store CSI driver is not supported, because the gateway cannot mount certificates from external volumes. If your current setup on the application routing add-on pulls certificates from Key Vault, plan to replace that flow with cert-manager or another way of syncing Secrets. On Traefik you would end up with the same Secret-based setup, so this point is less about Traefik being better and more about Application Gateway for Containers removing an Azure-native option you might expect it to have.</p>
+
+<p>If you are fully committed to Azure, want Microsoft to run the data plane and need nothing beyond its feature list, it can still be a sensible choice. We would not start there.</p>
 
 <h3>Other Gateway API implementations</h3>
 
-<p>Any conformant Gateway API implementation (Envoy Gateway, kgateway, Cilium and others) can work on AKS if you are prepared to run it yourself. The upstream <a href="https://gateway-api.sigs.k8s.io/guides/getting-started/migrating-from-ingress-nginx/">guide for ingress-nginx users</a> recommends starting with <a href="https://github.com/kubernetes-sigs/ingress2gateway">ingress2gateway</a>, which converts Ingress objects and ingress-nginx annotations into Gateway API resources and warns about what it could not translate. On application routing clusters, pass the class explicitly, since the tool reads class <code>nginx</code> by default:</p>
+<p>Any conformant Gateway API implementation (Envoy Gateway, kgateway, Cilium and others) can work on AKS if you are prepared to run it yourself. The upstream <a href="https://gateway-api.sigs.k8s.io/guides/getting-started/migrating-from-ingress-nginx/">guide for ingress-nginx users</a> recommends starting with <a href="https://github.com/kubernetes-sigs/ingress2gateway">ingress2gateway</a>, which converts Ingress objects and ingress-nginx annotations into Gateway API resources and warns about what it could not translate. The tool is also useful if you start on Traefik's ingress-nginx provider and later move routes to Gateway API. On application routing clusters, pass the class explicitly, since the tool reads class <code>nginx</code> by default:</p>
 
 <pre><code>ingress2gateway print --providers=ingress-nginx \
   --ingress-nginx-ingress-class=webapprouting.kubernetes.azure.com -A</code></pre>
@@ -93,16 +114,16 @@ helm upgrade --install traefik traefik/traefik \
     <tr><th>Option</th><th>APIs</th><th>Data plane</th><th>Main limits to check</th></tr>
   </thead>
   <tbody>
-    <tr><td>App routing Gateway API</td><td>Gateway API</td><td>Envoy in cluster, managed by AKS</td><td>No body/header size limits, Lua or rate limiting; no EnvoyFilter</td></tr>
+    <tr><td>Traefik (recommended)</td><td>Ingress (with nginx annotations), Gateway API, own CRDs and Middleware</td><td>In cluster, self-managed</td><td>Unsupported annotations; not Microsoft-supported</td></tr>
+    <tr><td>App routing Gateway API</td><td>Gateway API</td><td>Envoy in cluster, managed by AKS</td><td>No body/header size limits, Lua or rate limiting; no EnvoyFilter; manifests must be rewritten</td></tr>
     <tr><td>Istio service mesh add-on</td><td>Gateway API</td><td>Envoy in cluster</td><td>EnvoyFilter outside Azure support; manual canary upgrades</td></tr>
-    <tr><td>Application Gateway for Containers</td><td>Ingress and Gateway API</td><td>Azure-hosted</td><td>Ports 80/443 only; region list; separate Azure cost</td></tr>
-    <tr><td>Traefik</td><td>Ingress (with nginx annotations), Gateway API, own CRDs</td><td>In cluster, self-managed</td><td>Unsupported annotations; not Microsoft-supported</td></tr>
+    <tr><td>Application Gateway for Containers</td><td>Ingress and Gateway API</td><td>Azure-hosted, outside the cluster</td><td>Azure-only; changes go through Azure APIs; ports 80/443 only; FQDN frontends; region list; /24 subnet; separate Azure cost; no Key Vault CSI</td></tr>
   </tbody>
 </table>
 
 <h2>Run both controllers and cut over with DNS</h2>
 
-<p>Every option above gets its own load balancer IP, so the safe pattern is the same for all of them. Microsoft's <a href="https://learn.microsoft.com/en-us/azure/aks/app-routing-nginx-to-gateway-api-migration">add-on migration guide</a> and Traefik's <a href="https://doc.traefik.io/traefik/master/migrate/nginx-to-traefik/">NGINX migration guide</a> both describe a variant of it:</p>
+<p>Every option above gets its own address, so the safe pattern is the same for all of them. Microsoft's <a href="https://learn.microsoft.com/en-us/azure/aks/app-routing-nginx-to-gateway-api-migration">add-on migration guide</a> and Traefik's <a href="https://doc.traefik.io/traefik/master/migrate/nginx-to-traefik/">NGINX migration guide</a> both describe a variant of it:</p>
 
 <ol>
   <li>Inventory hostnames and anything upstream that pins the current IP: Front Door origins, Traffic Manager endpoints, firewall allow lists.</li>
@@ -136,8 +157,8 @@ helm upgrade --install traefik traefik/traefik \
 
 <h2>WAF and CrowdSec middleware on Traefik</h2>
 
-<p>ingress-nginx can switch on ModSecurity per Ingress with the <code>enable-modsecurity</code> annotation, and that annotation is on Traefik's unsupported list. On Traefik the usual route is a community plugin for ModSecurity or CrowdSec, and those plugins run inside the Yaegi Go interpreter on every request. A Traefik <a href="https://github.com/traefik/traefik/issues/12213">issue about compiling middlewares into the binary</a> describes memory and CPU problems with interpreted middleware on busy routes; it was closed without being added to the roadmap. Building the middleware into the binary avoids the interpreter. That is what our <a href="/traefik-precompiled/">Traefork</a> does: it is a soft-fork that stays in sync with upstream Traefik and compiles ModSecurity, Geoblock, RealIP, CrowdSec and Sablier into the binary. It is not affiliated with Traefik Labs.</p>
+<p>ingress-nginx can switch on ModSecurity per Ingress with the <code>enable-modsecurity</code> annotation, and that annotation is on Traefik's unsupported list. On Traefik the usual route is a community plugin for ModSecurity or CrowdSec, attached to routes as a Middleware like any other. Those plugins run inside the Yaegi Go interpreter on every request. A Traefik <a href="https://github.com/traefik/traefik/issues/12213">issue about compiling middlewares into the binary</a> describes memory and CPU problems with interpreted middleware on busy routes; it was closed without being added to the roadmap. Building the middleware into the binary avoids the interpreter. That is what our <a href="/traefik-precompiled/">Traefork</a> does: it is a soft-fork that stays in sync with upstream Traefik and compiles ModSecurity, Geoblock, RealIP, CrowdSec and Sablier into the binary. It is not affiliated with Traefik Labs.</p>
 
 <h2>A practical next step</h2>
 
-<p>Run the inventory commands on each cluster and keep the output. The annotation counts and the snippet list usually make the choice for you: plain host and path routing moves cleanly to the app routing Gateway API implementation, a WAF requirement points to Application Gateway for Containers or Traefik with a WAF middleware, and a long tail of nginx annotations makes Traefik's ingress-nginx provider the quickest way off an unpatched controller. If you want a second opinion on the plan, our <a href="/consulting/">Kubernetes consulting</a> covers this kind of migration.</p>
+<p>Run the inventory commands on each cluster and keep the output. The annotation counts and the snippet list usually make the choice for you. A long tail of nginx annotations makes Traefik's ingress-nginx provider the quickest way off an unpatched controller, and it leaves room to move to Gateway API later. A WAF or CrowdSec requirement is also something we would handle on Traefik, with plugin middleware or a build that compiles it in. If all you have is plain host and path routing and you would rather AKS managed the controller, the app routing Gateway API implementation is the Microsoft-supported route. If you want a second opinion on the plan, our <a href="/consulting/">Kubernetes consulting</a> covers this kind of migration.</p>
