@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="When an Azure SQL elastic pool beats single databases, how to size it from real metrics, what per-database min and max settings do, and how to scale it.">
+  <title>Azure SQL elastic pool sizing: per-database limits and scaling — Mutex Studio</title>
+
+  <link rel="icon" href="/assets/img/favicons/icon.svg?v=5" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png?v=5">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png?v=5">
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/img/favicons/favicon.ico?v=5">
+  <link rel="manifest" href="/assets/img/favicons/site.webmanifest">
+  <link rel="stylesheet" href="/assets/css/site.css?v=20">
+  <link rel="canonical" href="https://www.mutexstudio.com/blog/azure-sql-elastic-pool/">
+  <link rel="alternate" type="application/rss+xml" title="Mutex Studio blog" href="https://www.mutexstudio.com/blog/feed.xml">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Mutex Studio">
+  <meta property="og:title" content="Azure SQL elastic pool sizing: per-database limits and scaling — Mutex Studio">
+  <meta property="og:description" content="When an Azure SQL elastic pool beats single databases, how to size it from real metrics, what per-database min and max settings do, and how to scale it.">
+  <meta property="og:url" content="https://www.mutexstudio.com/blog/azure-sql-elastic-pool/">
+  <meta property="og:image" content="https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta property="article:published_time" content="2026-11-24">
+  <meta property="article:modified_time" content="2026-11-24">
+  <meta property="article:author" content="David García García">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Azure SQL elastic pool sizing: per-database limits and scaling",
+  "description": "When an Azure SQL elastic pool beats single databases, how to size it from real metrics, what per-database min and max settings do, and how to scale it.",
+  "datePublished": "2026-11-24",
+  "dateModified": "2026-11-24",
+  "inLanguage": "en",
+  "wordCount": 1662,
+  "url": "https://www.mutexstudio.com/blog/azure-sql-elastic-pool/",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.mutexstudio.com/blog/azure-sql-elastic-pool/"
+  },
+  "image": "https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png",
+  "author": {
+    "@type": "Person",
+    "name": "David García García",
+    "url": "https://medium.com/@deividb"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Mutex Studio",
+    "url": "https://www.mutexstudio.com/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.mutexstudio.com/assets/img/favicons/android-chrome-512x512.png"
+    }
+  }
+}
+  </script>
+</head>
+
+<body class="accent-blue page-blog">
+
+  <nav class="site-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+    </a>
+
+    <div class="nav-desktop">
+      <div class="nav-group">
+        <button type="button" class="nav-trigger" aria-haspopup="true">
+          Products
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="/azure-autoscaler/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--blue">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Azure Autoscaler</div>
+              <div class="nav-dropdown-desc">Smart resource scaling</div>
+            </div>
+          </a>
+          <a href="/storage-observer/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--violet">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Storage Observer</div>
+              <div class="nav-dropdown-desc">File storage at any scale</div>
+            </div>
+          </a>
+          <a href="/traefik-precompiled/" class="nav-dropdown-item">
+            <div class="nav-dropdown-icon nav-dropdown-icon--emerald">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+              <div class="nav-dropdown-title">Traefork</div>
+              <div class="nav-dropdown-desc">Soft-fork, plugins compiled in</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <a href="/consulting/" class="nav-link nav-link-consulting">Consulting</a>
+      <a href="/support/" class="nav-link nav-link-support">Support</a>
+      <a href="/blog/" class="nav-link nav-link-blog">Blog</a>
+    </div>
+
+    <a href="/consulting/#contact" class="nav-cta">Talk to us</a>
+
+    <button type="button" id="mobile-menu-btn" class="nav-mobile-btn" aria-label="Open menu">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="nav-mobile">
+    <p class="nav-mobile-label">Products</p>
+    <a href="/azure-autoscaler/" class="nav-mobile-link">Azure Autoscaler</a>
+    <a href="/storage-observer/" class="nav-mobile-link">Storage Observer</a>
+    <a href="/traefik-precompiled/" class="nav-mobile-link">Traefork</a>
+    <div class="nav-mobile-divider"></div>
+    <a href="/consulting/" class="nav-mobile-link">Consulting</a>
+    <a href="/support/" class="nav-mobile-link">Support</a>
+    <a href="/blog/" class="nav-mobile-link">Blog</a>
+    <a href="/consulting/#contact" class="nav-mobile-cta">Talk to us</a>
+  </div>
+</nav>
+
+  <main class="post">
+    <article class="post-inner">
+      <a href="/blog/" class="hero-back">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        All posts
+      </a>
+      <header class="post-header">
+        <p class="eyebrow">Azure SQL</p>
+        <h1>Azure SQL elastic pool sizing: per-database limits and scaling</h1>
+        <p class="post-lead">An elastic pool lets a group of databases share one allocation of compute and storage, billed per pool rather than per database. Whether it saves money, and how big it should be, depends on when each database is busy.</p>
+        <p class="post-meta"><span>By David García García</span><span><time datetime="2026-11-24">24 November 2026</time></span><span>8 min read</span></p>
+      </header>
+
+      <div class="prose">
+<p>Most teams meet the Azure SQL elastic pool when the number of databases starts to grow, typically in a SaaS application with one database per tenant. Sizing each of those databases for its own peak is expensive, and sizing them for their average makes them slow when they get busy. A pool sits between the two: the databases share a fixed amount of compute and storage, and you pay for the pool. This post covers when a pool beats single databases, how to size it, what the per-database settings guarantee, and how to scale it by hand or on a schedule.</p>
+
+<h2>When an Azure SQL elastic pool pays off</h2>
+
+<p>Microsoft's <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/elastic-pool-overview">elastic pool overview</a> describes the right workload clearly: many databases with low average utilization and infrequent spikes, with the spikes happening at different times. It also says the opposite case, several databases with persistent medium to high utilization, should not share a pool. The more databases you can put in a pool, the larger the saving, and depending on the usage pattern Microsoft says a saving is possible with as few as two S3 databases.</p>
+
+<p>The billing model explains why. There is no per-database charge. You are billed for each hour the pool exists at the highest eDTU or vCore setting that applied in that hour, whatever the databases did. In the DTU model, the eDTU unit price for a pool is 1.5 times the DTU unit price for a single database, so a pool only wins if the databases need far fewer eDTUs in total than they would need as separate databases. In the vCore model, the vCore unit price is the same for pools and single databases, which makes the comparison simpler.</p>
+
+<p>Microsoft's sizing estimate is the same in both models, with eDTUs or vCores as the unit:</p>
+
+<pre><code>pool_size ≈ MAX(total_dbs × avg_usage_per_db,
+                concurrently_peaking_dbs × peak_usage_per_db)</code></pre>
+
+<p>Take the smallest pool size above that number, look up its price for your region on the <a href="https://azure.microsoft.com/en-us/pricing/details/azure-sql-database/elastic/">elastic pool pricing page</a>, and compare it with the current cost of the databases as single databases. Prices vary by region and change over time, so do this with your own numbers. If some of the candidates are intermittent single databases, the <a href="/blog/azure-sql-serverless-vs-provisioned/">serverless vs provisioned comparison</a> is worth reading as well, since serverless is the other common answer to idle databases.</p>
+
+<h2>Azure SQL elastic pool DTU vs vCore</h2>
+
+<p>The <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/purchasing-models">purchasing models page</a> sums up the difference. DTU pools (Basic, Standard, Premium) sell a bundle of CPU, memory and IO measured in eDTUs, with an amount of storage included. vCore pools (General Purpose, Business Critical, Hyperscale) let you choose compute and storage separately, and the vCore model is where Azure Hybrid Benefit applies. In both models compute, IO and data storage are charged per pool, but backup storage is always charged per database.</p>
+
+<p>For sizing, the main practical difference is how the pool reports usage. In a DTU pool, the eDTU figure is derived from several pool-level metrics and is not the sum or maximum of the databases' DTU usage, so a single database can hit its own CPU or IO limit while the pool's eDTU graph looks fine. If you are building a new pool, vCore is the model Microsoft recommends, and you can convert a pool between models online later.</p>
+
+<h2>Azure SQL elastic pool per database settings</h2>
+
+<p>A pool has three per-database properties, described in the resource limits pages for <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/resource-limits-dtu-elastic-pools">DTU pools</a> and <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-elastic-pools">vCore pools</a>. Min and max eDTUs or vCores per database are set once for the whole pool; you cannot give one database a different value. Max storage per database is set on each database individually.</p>
+
+<ul>
+<li><strong>Max per database</strong> caps how much any one database may use, if the capacity is free. It is not a guarantee. Its main use is stopping a single database from taking over the pool.</li>
+<li><strong>Min per database</strong> reserves capacity for every database, whether it is busy or not. The default is 0. Reserved capacity is not available to the active databases, and it limits how many databases fit: Microsoft's example is that a min of 2 vCores in a 20 vCore pool allows at most 10 databases.</li>
+<li><strong>Max storage per database</strong> limits the data files of that database. The size it can actually reach is the smaller of that value and the space left in the pool, and the log file is not included.</li>
+</ul>
+
+<p>Two details are easy to miss. First, although the settings are expressed in eDTUs or vCores, they also scale the limits for data IO, log IO, buffer pool memory and worker threads. On standard-series (Gen5) hardware, a max of 0.5 vCores per database means a limit of 50 concurrent workers for each database. Second, when the pool is fully busy, each database gets an equal share of compute time, on top of whatever min you configured. Only specific values are allowed for each pool size; the CLI can list them:</p>
+
+<pre><code>az sql elastic-pool list-editions -l westeurope --edition Standard --dtu 100 \
+  -o table --show-details db-min-dtu db-max-dtu db-max-size
+
+az sql elastic-pool update -g "$RG" -s "$SERVER" -n "$POOL" \
+  --db-min-capacity 0 --db-max-capacity 2</code></pre>
+
+<h2>Metrics to size and watch a pool</h2>
+
+<p>Microsoft's article on <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/elastic-pool-resource-management">resource management in dense elastic pools</a> gives recommended averages for the pool-level metrics. Going above them is a sign of contention between databases.</p>
+
+<table>
+  <thead>
+    <tr><th>Metric</th><th>Azure Monitor name</th><th>Recommended average</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>avg_instance_cpu_percent</code></td><td><code>sql_instance_cpu_percent</code></td><td>Below 70%</td></tr>
+    <tr><td><code>max_worker_percent</code></td><td><code>workers_percent</code></td><td>Below 80%</td></tr>
+    <tr><td><code>avg_data_io_percent</code></td><td><code>physical_data_read_percent</code></td><td>Below 80%</td></tr>
+    <tr><td><code>avg_log_write_percent</code></td><td><code>log_write_percent</code></td><td>Below 90%</td></tr>
+    <tr><td><code>avg_allocated_storage_percent</code></td><td><code>allocated_data_storage_percent</code></td><td>Below 90%</td></tr>
+    <tr><td><code>tempdb_log_used_percent</code></td><td><code>tempdb_log_used_percent</code></td><td>Below 50%</td></tr>
+  </tbody>
+</table>
+
+<p>For history, <a href="https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-elastic-pool-resource-stats-azure-sql-database">sys.elastic_pool_resource_stats</a> in the <code>master</code> database keeps one row per pool every 15 seconds for 14 days, and requires membership in <code>dbmanager</code>. This query rolls it up by hour, which is the resolution that matters for billing and for scheduled scaling:</p>
+
+<pre><code>SELECT DATEADD(hour, DATEDIFF(hour, 0, end_time), 0) AS hour_utc,
+       AVG(avg_cpu_percent)          AS avg_cpu,
+       MAX(avg_cpu_percent)          AS peak_cpu,
+       MAX(avg_data_io_percent)      AS peak_data_io,
+       MAX(avg_log_write_percent)    AS peak_log_write,
+       MAX(max_worker_percent)       AS peak_workers,
+       MAX(avg_instance_cpu_percent) AS peak_instance_cpu,
+       MAX(avg_storage_percent)      AS storage_used_pct
+FROM sys.elastic_pool_resource_stats
+WHERE elastic_pool_name = 'my-pool'
+  AND end_time &gt; DATEADD(day, -14, SYSUTCDATETIME())
+GROUP BY DATEADD(hour, DATEDIFF(hour, 0, end_time), 0)
+ORDER BY hour_utc;</code></pre>
+
+<p>To estimate the "concurrently peaking databases" term of the sizing formula, look at individual databases in <a href="https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-resource-stats-azure-sql-database">sys.resource_stats</a>, also in <code>master</code>, which keeps five-minute rows for about 14 days. For pooled databases its percentages are relative to the per-database max, not to the pool. In Azure Monitor, the pool exposes <code>eDTU_used</code> and <code>dtu_consumption_percent</code> for DTU pools, and <code>cpu_used</code> and <code>cpu_percent</code> for vCore pools, as listed in the <a href="https://learn.microsoft.com/en-us/azure/azure-monitor/reference/supported-metrics/microsoft-sql-servers-elasticpools-metrics">elastic pool metrics reference</a>.</p>
+
+<h2>Storage: pool size, database max size and tempdb</h2>
+
+<p>A pool has a max data size, and all databases draw from it. In vCore pools you set it in 1 GB steps up to the limit for the pool size, and you pay for the max data size you set, not for what is used. In DTU pools each size includes some storage, and Standard and Premium pools can buy extra, up to the max for that size, from a fixed list of values. The <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/elastic-pool-scale">pool scaling article</a> points out a consequence: if you reduce a DTU pool's eDTUs but keep a max data size above the smaller size's included storage, you start paying for extra storage. Reduce the max data size as well if the used space allows it.</p>
+
+<p>Watch allocated space as well as used space. Out-of-space errors happen when the total size of the database files reaches the pool maximum, even if part of those files is empty. The storage limits in the tables do not include <code>tempdb</code> or the log. <code>tempdb</code> is shared by every database in the pool, so a long transaction in one database can fill the <code>tempdb</code> log for all of them, which is why it has its own metric. Its size depends on the pool size and is listed in the same resource limits pages.</p>
+
+<pre><code>az sql elastic-pool update -g "$RG" -s "$SERVER" -n "$POOL" --max-size 500GB
+az sql db update -g "$RG" -s "$SERVER" -n "$DB" --max-size 50GB</code></pre>
+
+<h2>Scaling the pool and moving databases</h2>
+
+<p>Scaling a pool works like scaling a single database: the service prepares new compute, then switches connections over, with a brief interruption that is generally under 30 seconds. What happens during that switch, and how to make your application retry, is covered in <a href="/blog/azure-sql-scaling-downtime/">our post on Azure SQL scaling downtime</a>. The duration is what differs. According to the latency table in the <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/elastic-pool-scale">scaling article</a>:</p>
+
+<ul>
+<li>Within Basic, Standard and General Purpose pools, latency is proportional to the number of databases.</li>
+<li>To, from or within Premium and Business Critical pools, data is copied, typically at less than 1 minute per GB, counted over the space used by all databases in the pool.</li>
+<li>Within Hyperscale pools it is constant, typically under 2 minutes.</li>
+</ul>
+
+<p>With the CLI or PowerShell (<a href="https://learn.microsoft.com/en-us/powershell/module/az.sql/set-azsqlelasticpool">Set-AzSqlElasticPool</a>):</p>
+
+<pre><code>az sql elastic-pool update -g "$RG" -s "$SERVER" -n "$POOL" \
+  --capacity 8 --db-max-capacity 4 --no-wait
+
+az sql elastic-pool op list -g "$RG" -s "$SERVER" --elastic-pool "$POOL" \
+  --query "[?state=='IN_PROGRESS'].name" -o tsv
+
+Set-AzSqlElasticPool -ResourceGroupName $rg -ServerName $server `
+  -ElasticPoolName $pool -VCore 8 -DatabaseVCoreMax 4 -AsJob</code></pre>
+
+<p>Moving a database in or out of a pool, or between pools on the same server, follows the same latency rules and also ends with dropped connections. With <a href="https://learn.microsoft.com/en-us/sql/t-sql/statements/alter-database-transact-sql?view=azuresqldb-current">ALTER DATABASE</a> or <a href="https://learn.microsoft.com/en-us/cli/azure/sql/db">az sql db update</a>:</p>
+
+<pre><code>-- Into a pool (or to another pool on the same server)
+ALTER DATABASE [tenant42] MODIFY (SERVICE_OBJECTIVE = ELASTIC_POOL(name = [pool1]));
+
+-- Out of the pool, back to a single database
+ALTER DATABASE [tenant42] MODIFY (SERVICE_OBJECTIVE = 'GP_Gen5_2');</code></pre>
+
+<pre><code>az sql db update -g "$RG" -s "$SERVER" -n tenant42 --elastic-pool pool1</code></pre>
+
+<p>The dense pools article adds two operational recommendations. Do not move a database out while it is the one causing the load, because the move itself adds load to the pool. And if you create new databases often, put them in a separate pool with spare capacity until you know how they behave, then move them.</p>
+
+<h2>Azure SQL elastic pool auto scaling on a schedule</h2>
+
+<p>Provisioned pools have no built-in autoscale. If the pool is busy during working hours and quiet otherwise, the usual approach is a scheduled job, an Automation runbook or a cron job with a managed identity, that runs the update command. Since billing uses the highest size in each hour, schedule changes close to hour boundaries. A minimal cron version, with placeholders for your sizes:</p>
+
+<pre><code># /etc/cron.d/sql-pool-scale (UTC)
+# Scale up before working hours, down after.
+50 6 * * 1-5  root  az login --identity -o none &amp;&amp; az sql elastic-pool update -g RG -s SERVER -n POOL --capacity BUSY_VCORES --db-max-capacity BUSY_DB_MAX -o none
+5 19 * * 1-5  root  az login --identity -o none &amp;&amp; az sql elastic-pool update -g RG -s SERVER -n POOL --capacity QUIET_VCORES --db-max-capacity QUIET_DB_MAX -o none</code></pre>
+
+<p>Set the per-database max in the same command, because the allowed values depend on the pool size. Before scaling down, check that used space fits the smaller size's max data size, and for Premium or Business Critical pools start scaling up early enough for the data copy to finish. If you would rather not maintain these jobs, <a href="/azure-autoscaler/">Azure Autoscaler</a> resizes elastic pools on schedules or from Azure Monitor metrics, and can change the pool DTU, max data size and per-database max capacity.</p>
+
+<h2>A practical next step</h2>
+
+<p>Run the hourly query above against an existing pool, or the same idea against <code>sys.resource_stats</code> for a group of candidate databases. Find the highest hourly peak and how many databases peak together, plug both into Microsoft's formula, and compare the result with what you pay now. If the quiet hours form a regular pattern, price a smaller pool for those hours too.</p>
+      </div>
+
+      <aside class="card post-cta" aria-label="Azure Autoscaler">
+        <p class="eyebrow">Azure Autoscaler</p>
+        <h2>Where Azure Autoscaler fits</h2>
+        <p>Azure Autoscaler can resize elastic pools on schedules, Azure Monitor metrics or forecasts, including the pool DTU, max data size and per-database max capacity. It runs as a container in your own environment and has a dry-run mode, so you can check what it would change first.</p>
+        <a href="/azure-autoscaler/" class="btn btn-primary">
+          See Azure Autoscaler
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+      </aside>
+
+      <p class="post-footer-nav"><a href="/blog/">← Back to all posts</a></p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" class="footer-logo-link">
+        <img src="/assets/img/logos/mutex-logo.svg" alt="Mutex Studio">
+      </a>
+      <p class="footer-tagline">Infrastructure tooling that fills the gaps. Self-hosted, production-grade.</p>
+    </div>
+    <div class="footer-columns">
+      <div>
+        <p class="footer-heading">Products</p>
+        <ul class="footer-links">
+          <li><a href="/azure-autoscaler/">Azure Autoscaler</a></li>
+          <li><a href="/storage-observer/">Storage Observer</a></li>
+          <li><a href="/traefik-precompiled/">Traefork</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-heading">Company</p>
+        <ul class="footer-links">
+          <li><a href="/consulting/">Consulting</a></li>
+          <li><a href="/support/">Support</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/consulting/#contact">Contact</a></li>
+          <li><a href="/traefik-precompiled/#licenses">Open Source Licenses</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Mutex Studio S.L. All rights reserved.</p>
+    <nav class="footer-legal" aria-label="Legal">
+      <a href="/aviso-legal/">Aviso legal</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/cookies/">Cookies</a>
+      <a href="#" data-cookie-settings>Cookie settings</a>
+    </nav>
+    <p>MUTEX STUDIO S.L. · NIF B05790308 · <a href="mailto:info@mutexstudio.com">info@mutexstudio.com</a></p>
+  </div>
+</footer>
+
+  <script src="/assets/js/site.js?v=6"></script>
+</body>
+</html>

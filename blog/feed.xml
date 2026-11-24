@@ -6,7 +6,15 @@
     <atom:link href="https://www.mutexstudio.com/blog/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Practical articles on Azure cost and autoscaling, Kubernetes ingress with Traefik, and file storage usage.</description>
     <language>en</language>
-    <lastBuildDate>Tue, 17 Nov 2026 05:14:30 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 24 Nov 2026 09:17:28 +0000</lastBuildDate>
+    <item>
+      <title>Azure SQL elastic pool sizing: per-database limits and scaling</title>
+      <link>https://www.mutexstudio.com/blog/azure-sql-elastic-pool/</link>
+      <guid isPermaLink="true">https://www.mutexstudio.com/blog/azure-sql-elastic-pool/</guid>
+      <pubDate>Tue, 24 Nov 2026 08:00:00 +0000</pubDate>
+      <dc:creator>David García García</dc:creator>
+      <description>When an Azure SQL elastic pool beats single databases, how to size it from real metrics, what per-database min and max settings do, and how to scale it.</description>
+    </item>
     <item>
       <title>Traefik CrowdSec on Kubernetes: bouncer plugin and AppSec</title>
       <link>https://www.mutexstudio.com/blog/traefik-crowdsec-kubernetes/</link>
